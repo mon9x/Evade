@@ -48,6 +48,24 @@ namespace Evade
 
         private static bool _followPath = false;
 
+        public static bool FollowPath
+        {
+            get
+            {
+                return _followPath;
+            }
+
+            set
+            {
+                _followPath = value;
+                if (!_followPath)
+                {
+                    PathFollower.Stop();
+                }
+            }
+        }
+        public static bool Keepfollowing { get; set; }
+
         public static int LastWardJumpAttempt = 0;
 
         public static Vector2 PreviousTickPosition = new Vector2();
@@ -59,8 +77,6 @@ namespace Evade
         private static int LastSentMovePacketT = 0;
         private static int LastSentMovePacketT2 = 0;
 
-        private static int LastSMovePacketT = 0;
-
         private static bool ForcePathFollowing = false;
         public static bool Evading
         {
@@ -69,9 +85,14 @@ namespace Evade
             {
                 if (value == true)
                 {
-                    ForcePathFollowing = true;
                     LastSentMovePacketT = 0;
                     ObjectManager.Player.SendMovePacket(EvadePoint);
+                }
+
+                if (value == false)
+                {
+                    FollowPath = true;
+                    Keepfollowing = true;
                 }
 
                 _evading = value;
@@ -83,6 +104,10 @@ namespace Evade
             get { return _evadePoint; }
             set
             {
+                if (value.IsValid())
+                {
+                    ObjectManager.Player.SendMovePacket(value);
+                }
                 _evadePoint = value;
             }
         }
@@ -102,7 +127,7 @@ namespace Evade
 
             //Add the game events.
             Game.OnUpdate += Game_OnOnGameUpdate;
-            EloBuddy.Player.OnIssueOrder += ObjAiHeroOnOnIssueOrder;
+            Player.OnIssueOrder += ObjAiHeroOnOnIssueOrder;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
             //Set up the OnDetectSkillshot Event.
             SkillshotDetector.OnDetectSkillshot += OnDetectSkillshot;
@@ -112,6 +137,7 @@ namespace Evade
             Drawing.OnDraw += Drawing_OnDraw;
 
             //Ondash event.
+            Dash.OnDash += UnitOnOnDash;
 
             DetectedSkillshots.OnAdd += DetectedSkillshots_OnAdd;
 
@@ -194,7 +220,6 @@ namespace Evade
         {
             //Check if the skillshot is already added.
             var alreadyAdded = false;
-
 
             if (Config.misc["DisableFow"].Cast<CheckBox>().CurrentValue && !skillshot.Unit.IsVisible)
             {
@@ -309,7 +334,7 @@ namespace Evade
                                 positions.Add(minion.ServerPosition.To2D());
                             }
                         }
-
+                        Console.WriteLine(positions.Count + " positions to check");
                         foreach (var position in positions)
                         {
                             var v = position - skillshot.Unit.ServerPosition.To2D();
@@ -355,7 +380,7 @@ namespace Evade
                         DetectedSkillshots.Add(skillshotToAdd);
                         return;
                     }
-
+                    
                     if (skillshot.SpellData.SpellName == "JinxE")
                     {
                         var start = skillshot.End - skillshot.Direction.Perpendicular() * 275;
@@ -489,7 +514,6 @@ namespace Evade
                 PlayerPosition.Distance(PreviousTickPosition) > 200)
             {
                 Evading = false;
-                EvadeToPoint = Vector2.Zero;
             }
 
             PreviousTickPosition = PlayerPosition;
@@ -525,6 +549,7 @@ namespace Evade
             {
                 Evading = false;
                 EvadeToPoint = Vector2.Zero;
+                PathFollower.Stop();
                 return;
             }
 
@@ -533,6 +558,7 @@ namespace Evade
             {
                 Evading = false;
                 EvadeToPoint = Vector2.Zero;
+                PathFollower.Stop();
                 return;
             }
 
@@ -559,6 +585,7 @@ namespace Evade
             //Don't evade while casting R as sion
             if (PlayerChampionName == "Sion" && ObjectManager.Player.HasBuff("SionR"))
             {
+                PathFollower.Stop();
                 return;
             }
 
@@ -581,11 +608,10 @@ namespace Evade
                             {
                                 dangerLevel = Math.Max(dangerLevel, skillshot.GetSliderValue("DangerLevel").CurrentValue);
                             }
-
                             foreach (var evadeSpell in EvadeSpellDatabase.Spells)
                             {
                                 if (evadeSpell.IsShield && evadeSpell.CanShieldAllies &&
-                                    ally.Distance(ObjectManager.Player.ServerPosition) < evadeSpell.MaxRange &&
+                                    ally.Distance(ObjectManager.Player) < evadeSpell.MaxRange &&
                                     dangerLevel >= evadeSpell.DangerLevel &&
                                     ObjectManager.Player.Spellbook.CanUseSpell(evadeSpell.Slot) == SpellState.Ready &&
                                     IsAboutToHit(ally, evadeSpell.Delay))
@@ -601,13 +627,36 @@ namespace Evade
             //Spell Shielded
             if (ObjectManager.Player.IsSpellShielded())
             {
+                PathFollower.Stop();
                 return;
+            }
+
+            if (NoSolutionFound)
+            {
+                PathFollower.Stop();
             }
 
             var currentPath = ObjectManager.Player.GetWaypoints();
             var safeResult = IsSafe(PlayerPosition);
             var safePath = IsSafePath(currentPath, 100);
 
+            /*FOLLOWPATH*/
+            if (FollowPath && !NoSolutionFound && (Keepfollowing || !Evading) && EvadeToPoint.IsValid() && safeResult.IsSafe)
+            {
+                if (EvadeSpellDatabase.Spells.Any(evadeSpell => evadeSpell.Name == "Walking" && evadeSpell.Enabled))
+                {
+                    if (Utils.TickCount - LastSentMovePacketT2 > 300)
+                    {
+                        var candidate = Pathfinding.Pathfinding.PathFind(PlayerPosition, EvadeToPoint);
+                        PathFollower.Follow(candidate);
+                        LastSentMovePacketT2 = Utils.TickCount;
+                    }
+                }
+            }
+            else
+            {
+                FollowPath = false;
+            }
 
             NoSolutionFound = false;
 
@@ -645,66 +694,15 @@ namespace Evade
                     //Search for an evade point:
                     TryToEvade(safeResult.SkillshotList, EvadeToPoint.IsValid() ? EvadeToPoint : Game.CursorPos.To2D());
                 }
-            }
 
-            /*FOLLOWPATH*/
-            if (!NoSolutionFound && !Evading && EvadeToPoint.IsValid() && safeResult.IsSafe)
-            {
-                if (EvadeSpellDatabase.Spells.Any(evadeSpell => evadeSpell.Name == "Walking" && evadeSpell.Enabled))
+                //Outside the danger polygon.
+                else
                 {
-                    if (safePath.IsSafe && !ForcePathFollowing)
+                    FollowPath = true;
+                    //Stop at the edge of the skillshot.
+                    if (EvadeSpellDatabase.Spells.Any(evadeSpell => evadeSpell.Name == "Walking" && evadeSpell.Enabled))
                     {
-                        return;
-                    }
-
-                    if (Utils.TickCount - LastSentMovePacketT2 > 1000 / 15 || !PathFollower.IsFollowing)
-                    {
-                        LastSentMovePacketT2 = Utils.TickCount;
-
-                        if (DetectedSkillshots.Count == 0)
-                        {
-                            if (ObjectManager.Player.Distance(EvadeToPoint) > 75)
-                            {
-                                ObjectManager.Player.SendMovePacket(EvadeToPoint);
-                            }
-                            return;
-                        }
-
-                        var path2 = ObjectManager.Player.GetPath(EvadeToPoint.To3D()).To2DList();
-                        var safePath2 = IsSafePath(path2, 100);
-
-                        if (safePath2.IsSafe)
-                        {
-                            if (ObjectManager.Player.Distance(EvadeToPoint) > 75)
-                            {
-                                ObjectManager.Player.SendMovePacket(EvadeToPoint);
-                            }
-                            return;
-                        }
-
-                        var candidate = Pathfinding.Pathfinding.PathFind(PlayerPosition, EvadeToPoint);
-
-                        if (candidate.Count == 0)
-                        {
-                            if (!safePath.Intersection.Valid && currentPath.Count <= 1)
-                            {
-                                safePath = IsSafePath(path2, 100);
-                            }
-
-                            if (safePath.Intersection.Valid)
-                            {
-                                if (ObjectManager.Player.Distance(safePath.Intersection.Point) > 75)
-                                {
-                                    ObjectManager.Player.SendMovePacket(safePath.Intersection.Point);
-                                    return;
-                                }
-                            }
-                        }
-
-                        PathFollower.Follow(candidate);
-
-                        PathFollower.KeepFollowingPath(new EventArgs());
-
+                        ObjectManager.Player.SendMovePacket(safePath.Intersection.Point);
                     }
                 }
             }
@@ -762,21 +760,6 @@ namespace Evade
                 return;
             }
 
-            if (args.Order == GameObjectOrder.MoveTo || args.Order == GameObjectOrder.AttackTo)
-            {
-                EvadeToPoint.X = args.TargetPosition.X;
-                EvadeToPoint.Y = args.TargetPosition.Y;
-            }
-            else
-            {
-                EvadeToPoint = Vector2.Zero;
-            }
-
-            if (DetectedSkillshots.Count == 0)
-            {
-                ForcePathFollowing = false;
-            }
-
             //Don't block the movement packets if cant find an evade point.
             if (NoSolutionFound)
             {
@@ -795,7 +778,7 @@ namespace Evade
             }
 
             //Spell Shielded
-            if (ObjectManager.Player.IsSpellShielded())
+            if (ObjectManager.Player.MagicShield > 0)
             {
                 return;
             }
@@ -803,6 +786,19 @@ namespace Evade
             if (PlayerChampionName == "Olaf" && Config.misc["DisableEvadeForOlafR"].Cast<CheckBox>().CurrentValue && ObjectManager.Player.HasBuff("OlafRagnarok"))
             {
                 return;
+            }
+
+            if (args.Order == GameObjectOrder.MoveTo || args.Order == GameObjectOrder.AttackTo)
+            {
+                EvadeToPoint.X = args.TargetPosition.X;
+                EvadeToPoint.Y = args.TargetPosition.Y;
+                Keepfollowing = false;
+                FollowPath = false;
+            }
+            else
+            {
+                EvadeToPoint.X = 0;
+                EvadeToPoint.Y = 0;
             }
 
             var myPath =
@@ -817,7 +813,6 @@ namespace Evade
                 var rcSafePath = IsSafePath(myPath, Config.EvadingRouteChangeTimeOffset);
                 if (args.Order == GameObjectOrder.MoveTo)
                 {
-                    var willMove = false;
 
                     if (Evading &&
                         Utils.TickCount - Config.LastEvadePointChangeT > Config.EvadePointChangeInterval)
@@ -830,7 +825,6 @@ namespace Evade
                             EvadePoint = to.Closest(points);
                             Evading = true;
                             Config.LastEvadePointChangeT = Utils.TickCount;
-                            willMove = true;
                         }
                     }
 
@@ -839,12 +833,6 @@ namespace Evade
                     {
                         EvadePoint = myPath[myPath.Count - 1];
                         Evading = true;
-                        willMove = true;
-                    }
-
-                    if (!willMove)
-                    {
-                        ForcePathFollowing = true;
                     }
                 }
 
@@ -863,13 +851,15 @@ namespace Evade
                 {
                     if (ObjectManager.Player.Distance(safePath.Intersection.Point) > 75)
                     {
-                        ForcePathFollowing = true;
-                        //ObjectManager.Player.SendMovePacket(safePath.Intersection.Point);
+                        ObjectManager.Player.SendMovePacket(safePath.Intersection.Point);
                     }
                 }
-
-                ForcePathFollowing = true;
+                FollowPath = true;
                 args.Process = false;
+            }
+            else if (safePath.IsSafe && args.Order != GameObjectOrder.AttackUnit)
+            {
+                FollowPath = false;
             }
 
             //AutoAttacks.
@@ -903,6 +893,7 @@ namespace Evade
                         Utils.TickCount + "DASH: Speed: " + args.Speed + " Width:" +
                         args.EndPos.Distance(args.StartPos));*/
                 }
+
                 //Utility.DelayAction.Add(args.Duration, delegate { Evading = false; });
             }
         }
@@ -954,7 +945,6 @@ namespace Evade
                     }
                 }
             }
-
 
             //Return the first intersection
             if (!IsSafe)
@@ -1144,7 +1134,6 @@ namespace Evade
                                                 }
                                             }
 
-
                                             var ePoint = to.Closest(points);
                                             ObjectManager.Player.Spellbook.CastSpell(wardSlot.SpellSlot, ePoint.To3D());
                                             LastWardJumpAttempt = Utils.TickCount;
@@ -1328,7 +1317,6 @@ namespace Evade
                                 points.RemoveAll(
                                     item => item.Distance(ObjectManager.Player.ServerPosition) > evadeSpell.MaxRange);
 
-
                                 //Dont blink just to the edge:
                                 for (var i = 0; i < points.Count; i++)
                                 {
@@ -1481,7 +1469,7 @@ namespace Evade
 
             if (Config.TestOnAllies)
             {
-                var myPath = ObjectManager.Player.GetWaypoints();
+                /*var myPath = ObjectManager.Player.GetWaypoints();
 
                 for (var i = 0; i < myPath.Count - 1; i++)
                 {
@@ -1507,6 +1495,7 @@ namespace Evade
 
                 Drawing.DrawCircle(EvadePoint.To3D(), 300, Color.White);
                 Drawing.DrawCircle(EvadeToPoint.To3D(), 300, Color.Red);
+                */
             }
         }
 
