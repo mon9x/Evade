@@ -1160,6 +1160,24 @@ namespace Evade
                     CollisionObjects = new[] { CollisionObjectTypes.Champions, CollisionObjectTypes.YasuoWall },
                     CanBeRemoved = true,
                 });
+            
+            Spells.Add(
+                new SpellData
+                {
+                    ChampionName = "Fizz",
+                    SpellName = "FizzJump",
+                    Slot = SpellSlot.E,
+                    Type = SkillShotType.SkillshotCircle,
+                    Delay = 560,
+                    Range = 400,
+                    Radius = 360,
+                    MissileSpeed = int.MaxValue,
+                    FixedRange = false,
+                    AddHitbox = true,
+                    DangerValue = 3,
+                    IsDangerous = true,
+                    MissileSpellName = "FizzJumpBuffer",
+                });
 
             #endregion Fizz
 
