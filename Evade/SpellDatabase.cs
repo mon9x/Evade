@@ -2525,8 +2525,8 @@ namespace Evade
                     MissileSpellName = "lucianrmissileoffhand",
                     ExtraMissileNames = new[] { "lucianrmissile" },
                     EarlyEvade = new[] { EarlyObjects.Allies, EarlyObjects.Minions, EarlyObjects.AllyObjects },
-                    DontCheckForDuplicates = true,
-                    DisabledByDefault = true,
+                    DontCheckForDuplicates = false,
+                    DisabledByDefault = false,
                 });
 
             #endregion Lucian
