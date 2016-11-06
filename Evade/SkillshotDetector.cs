@@ -1,4 +1,4 @@
-﻿// Copyright 2014 - 2014 Esk0r
+// Copyright 2014 - 2014 Esk0r
 // SkillshotDetector.cs is part of Evade.
 // 
 // Evade is free software: you can redistribute it and/or modify
@@ -39,14 +39,13 @@ namespace Evade
         {
             //Detect when the skillshots are created.
             //Game.OnProcessPacket += GameOnOnGameProcessPacket; // Used only for viktor's Laser :^)
-            Obj_AI_Base.OnProcessSpellCast += ObjAiHeroOnOnProcessSpellCast;
+            Obj_AI_Base.OnSpellCast += ObjAiHeroOnOnProcessSpellCast;
 
             //Detect when projectiles collide.
             GameObject.OnDelete += ObjSpellMissileOnOnDelete;
             GameObject.OnCreate += ObjSpellMissileOnOnCreate;
             GameObject.OnCreate += GameObject_OnCreate; //TODO: Detect lux R and other large skillshots.
             GameObject.OnDelete += GameObject_OnDelete;
-
         }
 
 
@@ -62,10 +61,12 @@ namespace Evade
             {
                 return;
             }
+
             if (Config.skillShots["Enabled" + spellData.MenuItemName] == null)
             {
                 return;
             }
+            
         }
 
 
@@ -211,16 +212,16 @@ namespace Evade
 
 #if DEBUG
             /* Console.WriteLine(
-                "Missile deleted: " + missile.SData.Name + " D: " + missile.EndPosition.Distance(missile.Position)); */
+                 "Missile deleted: " + missile.SData.Name + " D: " + missile.EndPosition.Distance(missile.Position)); */
 #endif
 
             Program.DetectedSkillshots.RemoveAll(
                 skillshot =>
                     (skillshot.SpellData.MissileSpellName.Equals(spellName, StringComparison.InvariantCultureIgnoreCase) ||
-                      skillshot.SpellData.ExtraMissileNames.Contains(spellName, StringComparer.InvariantCultureIgnoreCase)) &&
-                      (skillshot.Unit.NetworkId == caster.NetworkId &&
-                       ((missile.EndPosition.To2D() - missile.StartPosition.To2D()).AngleBetween(skillshot.Direction) < 10) &&
-                       skillshot.SpellData.CanBeRemoved || skillshot.SpellData.ForceRemove)); //  
+                     skillshot.SpellData.ExtraMissileNames.Contains(spellName, StringComparer.InvariantCultureIgnoreCase)) &&
+                    (skillshot.Unit.NetworkId == caster.NetworkId &&
+                     ((missile.EndPosition.To2D() - missile.StartPosition.To2D()).AngleBetween(skillshot.Direction) < 10) &&
+                     skillshot.SpellData.CanBeRemoved || skillshot.SpellData.ForceRemove)); // 
         }
 
         /// <summary>
@@ -239,9 +240,13 @@ namespace Evade
             int startT,
             Vector2 start,
             Vector2 end,
+            //Vector2 originalEnd,
             Obj_AI_Base unit)
         {
-            var skillshot = new Skillshot(detectionType, spellData, startT, start, end, unit);
+            var skillshot = new Skillshot(detectionType, spellData, startT, start, end, unit)
+            {
+                //OriginalEnd = originalEnd;
+            };
 
 
             if (OnDetectSkillshot != null)
@@ -325,6 +330,12 @@ namespace Evade
 
             var endPos = args.End.To2D();
 
+            /*if (spellData.SpellName == "LucianQ" && args.Target != null &&
+                args.Target.NetworkId == ObjectManager.Player.NetworkId)
+            {
+                return;
+            }*/
+
             //Calculate the real end Point:
             var direction = (endPos - startPos).Normalized();
             if (startPos.Distance(endPos) > spellData.Range || spellData.FixedRange)
@@ -354,7 +365,7 @@ namespace Evade
             {
                 var packet = new GamePacket(args.PacketData);
 
-                packet.SetHeader(new PacketHeader(packet));
+                packet.Position = 1;
 
                 packet.Read<float>(); //Missile network ID
 
