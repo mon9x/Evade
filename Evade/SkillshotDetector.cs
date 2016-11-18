@@ -66,7 +66,7 @@ namespace Evade
             {
                 return;
             }
-            
+            TriggerOnDetectSkillshot(DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, sender.Position.To2D(), sender.Position.To2D(), EntityManager.Heroes.AllHeroes.MinOrDefault(h => h.IsAlly ? 1 : 0));
         }
 
 
