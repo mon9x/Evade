@@ -46,6 +46,21 @@ namespace Evade
             GameObject.OnCreate += ObjSpellMissileOnOnCreate;
             GameObject.OnCreate += GameObject_OnCreate; //TODO: Detect lux R and other large skillshots.
             GameObject.OnDelete += GameObject_OnDelete;
+
+            if (Config.TestOnAllies && ObjectManager.Get<AIHeroClient>().Count() == 1)
+            {
+                Game.OnWndProc += Game_OnWndProc;
+            }
+        }
+
+        private static void Game_OnWndProc(WndEventArgs args)
+        {
+            if (args.Msg == (uint)WindowMessages.KeyUp)
+            {
+                TriggerOnDetectSkillshot(
+                    DetectionType.ProcessSpell, SpellDatabase.GetByName("TestSkillShot"), Utils.TickCount,
+                    Program.PlayerPosition, Game.CursorPos.To2D(), Game.CursorPos.To2D(), ObjectManager.Player);
+            }
         }
 
 
@@ -66,7 +81,8 @@ namespace Evade
             {
                 return;
             }
-            TriggerOnDetectSkillshot(DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, sender.Position.To2D(), sender.Position.To2D(), EntityManager.Heroes.AllHeroes.MinOrDefault(h => h.IsAlly ? 1 : 0));
+            TriggerOnDetectSkillshot(DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, sender.Position.To2D(), sender.Position.To2D(), sender.Position.To2D(), EntityManager.Heroes.AllHeroes.MinOrDefault(h => h.IsAlly ? 1 : 0));
+
         }
 
 
@@ -172,7 +188,7 @@ namespace Evade
                            (int)(1000f * missilePosition.Distance(unitPosition) / spellData.MissileSpeed);
 
             //Trigger the skillshot detection callbacks.
-            TriggerOnDetectSkillshot(DetectionType.RecvPacket, spellData, castTime, unitPosition, endPos, unit);
+            TriggerOnDetectSkillshot(DetectionType.RecvPacket, spellData, castTime, unitPosition, endPos, endPos, unit);
         }
 
         /// <summary>
@@ -240,12 +256,12 @@ namespace Evade
             int startT,
             Vector2 start,
             Vector2 end,
-            //Vector2 originalEnd,
+            Vector2 originalEnd,
             Obj_AI_Base unit)
         {
             var skillshot = new Skillshot(detectionType, spellData, startT, start, end, unit)
             {
-                //OriginalEnd = originalEnd;
+                OriginalEnd = originalEnd
             };
 
 
@@ -317,7 +333,7 @@ namespace Evade
                         var start = obj.Position.To2D();
                         var end = start + spellData.Range * (args.End.To2D() - obj.Position.To2D()).Normalized();
                         TriggerOnDetectSkillshot(
-                            DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, start, end,
+                            DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, start, end, end,
                             sender);
                     }
                 }
@@ -352,7 +368,7 @@ namespace Evade
 
             //Trigger the skillshot detection callbacks.
             TriggerOnDetectSkillshot(
-                DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, startPos, endPos, sender);
+                DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, startPos, endPos, args.End.To2D(), sender);
         }
 
         /// <summary>
@@ -408,7 +424,7 @@ namespace Evade
                 //Trigger the skillshot detection callbacks.
                 TriggerOnDetectSkillshot(
                     DetectionType.RecvPacket, spellData, castTime, unitPosition.SwitchYZ().To2D(),
-                    endPos.SwitchYZ().To2D(), unit);
+                    endPos.SwitchYZ().To2D(), endPos.SwitchYZ().To2D(), unit);
             }
         }
     }
