@@ -452,19 +452,19 @@ namespace Evade
                     Slot = SpellSlot.Q,
                     Type = SkillShotType.SkillshotMissileLine,
                     Delay = 250,
-                    Range = 1050,
+                    Range = 925,
                     Radius = 70,
-                    MissileSpeed = 1800,
+                    MissileSpeed = 1750,
                     FixedRange = true,
                     AddHitbox = true,
                     DangerValue = 4,
                     IsDangerous = true,
                     MissileSpellName = "RocketGrabMissile",
-                    EarlyEvade = new[] {EarlyObjects.Allies, EarlyObjects.Minions, EarlyObjects.AllyObjects},
+                    EarlyEvade = new[] { EarlyObjects.Allies, EarlyObjects.Minions, EarlyObjects.AllyObjects },
                     CanBeRemoved = true,
                     CollisionObjects =
                         new[]
-                        {CollisionObjectTypes.Champions, CollisionObjectTypes.Minion, CollisionObjectTypes.YasuoWall}
+                        { CollisionObjectTypes.Champions, CollisionObjectTypes.Minion, CollisionObjectTypes.YasuoWall }
                 });
 
             Spells.Add(
