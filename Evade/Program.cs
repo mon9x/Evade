@@ -545,14 +545,14 @@ namespace Evade
             }
 
             //Avoid sending move/cast packets while channeling interruptable spells that cause hero not being able to move.
-            if (Player.Instance.Spellbook.IsChanneling)
+            if (ObjectManager.Player.Spellbook.IsChanneling)
             {
                 Evading = false;
                 EvadeToPoint = Vector2.Zero;
                 return;
             }
 
-            if (Utility.PlayerWindingUp && !Orbwalker.IsAutoAttacking)
+            if (ObjectManager.Player.Spellbook.IsAutoAttacking && !Orbwalker.IsAutoAttacking)
             {
                 Evading = false;
                 return;
@@ -595,7 +595,7 @@ namespace Evade
 
                             foreach (var skillshot in allySafeResult.SkillshotList)
                             {
-                                dangerLevel = Math.Max(dangerLevel, skillshot.GetSliderValue("DangerLevel").CurrentValue);
+                                dangerLevel = Math.Max(dangerLevel, skillshot.GetSliderValue("DangerLevel" + skillshot.SpellData.MenuItemName).CurrentValue);
                             }
 
                             foreach (var evadeSpell in EvadeSpellDatabase.Spells)
@@ -749,7 +749,7 @@ namespace Evade
                     {
                         if (skillshot.Evade() && skillshot.IsDanger(PlayerPosition))
                         {
-                            isDangerous = skillshot.GetCheckBoxValue("IsDangerous").CurrentValue;
+                            isDangerous = skillshot.GetCheckBoxValue("IsDangerous" + skillshot.SpellData.MenuItemName).CurrentValue;
                             if (isDangerous)
                             {
                                 break;

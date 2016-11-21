@@ -442,7 +442,7 @@ namespace Evade
 
             #endregion
 
-            #region Blatzcrank
+            #region Blitzcrank
 
             Spells.Add(
                 new SpellData
@@ -452,9 +452,9 @@ namespace Evade
                     Slot = SpellSlot.Q,
                     Type = SkillShotType.SkillshotMissileLine,
                     Delay = 250,
-                    Range = 925,
+                    Range = 1050,
                     Radius = 70,
-                    MissileSpeed = 1750,
+                    MissileSpeed = 1800,
                     FixedRange = true,
                     AddHitbox = true,
                     DangerValue = 4,
