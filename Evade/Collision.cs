@@ -58,10 +58,11 @@ namespace Evade
 
         public static void Init()
         {
-            Obj_AI_Base.OnSpellCast += Obj_AI_Hero_OnProcessSpellCast;
+            Obj_AI_Base.OnSpellCast += AIHeroClient_OnProcessSpellCast;
         }
 
-        private static void Obj_AI_Hero_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+
+        private static void AIHeroClient_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (sender.IsValid && sender.Team == ObjectManager.Player.Team && args.SData.Name == "YasuoWMovingWall")
 
@@ -114,7 +115,6 @@ namespace Evade
                                     ? EntityManager.UnitTeam.Enemy
                                     : EntityManager.UnitTeam.Ally,
                             from.To3D(), 1200))
-
                         {
                             var pred = FastPrediction(
                                 from, minion,

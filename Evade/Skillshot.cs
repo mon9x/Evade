@@ -201,6 +201,7 @@ namespace Evade
         {
             return Config.skillShots[name + SpellData.MenuItemName].Cast<KeyBind>();
         }
+
         /// <summary>
         /// Returns if the skillshot has expired.
         /// </summary>
@@ -277,8 +278,6 @@ namespace Evade
                 Rectangle = new Geometry.Rectangle(Start, End, SpellData.Radius);
                 UpdatePolygon();
             }
-
-
 
             if (SpellData.SpellName == "SionR")
             {
@@ -669,7 +668,6 @@ namespace Evade
 
             return false;
         }
-
 
         public void Draw(Color color, Color missileColor, int width = 1)
         {
