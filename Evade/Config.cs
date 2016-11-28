@@ -36,7 +36,7 @@ namespace Evade
         public const int SkillShotsExtraRange = 20;
         public const int GridSize = 10;
         public const int ExtraEvadeDistance = 15;
-        public const int PathFindingDistance = 60;
+        public const int PathFindingDistance = 65;
         public const int PathFindingDistance2 = 35;
 
         public const int DiagonalEvadePointsCount = 7;
@@ -139,6 +139,7 @@ namespace Evade
                     shielding.Add("shield" + ally.ChampionName, new CheckBox("Shield " + ally.ChampionName));
                 }
             }
+
             #endregion Shielding
 
             #region Collision
@@ -171,7 +172,7 @@ namespace Evade
             //drawings.AddItem(new MenuItem("EnabledColor", "Enabled spell color").SetValue(Color.White));
             //drawings.AddItem(new MenuItem("DisabledColor", "Disabled spell color").SetValue(Color.Red));
             //drawings.AddItem(new MenuItem("MissileColor", "Missile color").SetValue(Color.LimeGreen));
-            drawings.Add("Border", new Slider("Border Width", 2, 5, 2));
+            drawings.Add("Border", new Slider("Border Width", 1, 5, 1));
 
             drawings.Add("EnableDrawings", new CheckBox("Enabled"));
             drawings.Add("ShowEvadeStatus", new CheckBox("Draw Evade Status"));
@@ -181,7 +182,7 @@ namespace Evade
             #region Misc
 
             misc = Menu.AddSubMenu("Misc", "Misc");
-            misc.AddStringList("BlockSpells", "Block spells while evading", new[] { "No", "Only dangerous", "Always" }, 1);
+            misc.Add("BlockSpells", new ComboBox("Block spells while evading", 1, "No", "Only dangerous", "Always"));
             //misc.Add("BlockSpells", "Block spells while evading").SetValue(new StringList(new []{"No", "Only dangerous", "Always"}, 1)));
             misc.Add("DisableFow", new CheckBox("Disable fog of war dodging", false));
             misc.Add("ShowEvadeStatus", new CheckBox("Show Evade Status", false));

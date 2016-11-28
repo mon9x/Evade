@@ -26,6 +26,7 @@ using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Menu;
 using SharpDX;
 using Color = System.Drawing.Color;
 using GamePath = System.Collections.Generic.List<SharpDX.Vector2>;
