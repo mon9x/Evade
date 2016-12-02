@@ -450,7 +450,7 @@ namespace Evade
                     ChampionName = "Blitzcrank",
                     SpellName = "RocketGrab",
                     Slot = SpellSlot.Q,
-                    Type = SkillShotType.SkillshotMissileLine,
+                    Type = SkillShotType.SkillshotLine,
                     Delay = 250,
                     Range = 1050,
                     Radius = 80,
@@ -461,7 +461,7 @@ namespace Evade
                     IsDangerous = true,
                     MissileSpellName = "RocketGrabMissile",
                     EarlyEvade = new[] { EarlyObjects.Allies, EarlyObjects.Minions, EarlyObjects.AllyObjects },
-                    CanBeRemoved = false,
+                    CanBeRemoved = true,
                     CollisionObjects =
                         new[]
                         { CollisionObjectTypes.Champions, CollisionObjectTypes.Minion, CollisionObjectTypes.YasuoWall }
