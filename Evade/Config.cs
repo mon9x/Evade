@@ -185,7 +185,7 @@ namespace Evade
             misc.Add("BlockSpells", new ComboBox("Block spells while evading", 1, "No", "Only dangerous", "Always"));
             //misc.Add("BlockSpells", "Block spells while evading").SetValue(new StringList(new []{"No", "Only dangerous", "Always"}, 1)));
             misc.Add("DisableFow", new CheckBox("Disable fog of war dodging", false));
-            misc.Add("ShowEvadeStatus", new CheckBox("Show Evade Status", false));
+            //misc.Add("ShowEvadeStatus", new CheckBox("Show Evade Status", false));
             if (ObjectManager.Player.BaseSkinName == "Olaf")
             {
                 misc.Add("DisableEvadeForOlafR", new CheckBox("Automatic disable Evade when Olaf's ulti is active!"));
