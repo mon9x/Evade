@@ -293,7 +293,7 @@ namespace Evade
                 var outerCenter = outerCenters[0];
 
                 //Render.Circle.DrawCircle(innerCenter.To3D(), 100, Color.White);
-                new EloBuddy.SDK.Rendering.Circle() { BorderWidth = 2, Color = Color.White, Radius = 100 }.Draw(innerCenter.To3D()); ;
+                new EloBuddy.SDK.Rendering.Circle() { BorderWidth = 2, Color = Color.White, Radius = 100 }.Draw(innerCenter.To3D());
 
                 var direction = (End - outerCenter).Normalized();
                 var end = (Start - outerCenter).Normalized();
