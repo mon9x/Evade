@@ -334,7 +334,7 @@ namespace Evade
 
             if (ObjectManager.Player.ChampionName == "Corki")
             {
-                spell = new DashData("Corki W", SpellSlot.W, 790, false, 250, 1044, 3);
+                spell = new DashData("Corki W", SpellSlot.W, 600, false, 250, 1044, 3);
                 Spells.Add(spell);
             }
 
@@ -525,17 +525,6 @@ namespace Evade
             }
 
             #endregion
-            
-            #region Yasuo
-
-            if (ObjectManager.Player.ChampionName == "Yasuo")
-            {
-                spell = new DashData("Yasuo E", SpellSlot.E, 475, true, 50, 2000, 2); //550 cast range?
-                spell.ValidTargets = new[] { SpellValidTargets.EnemyChampions, SpellValidTargets.EnemyMinions };
-                Spells.Add(spell);
-            }
-
-            #endregion
 
             #endregion
 
@@ -651,8 +640,7 @@ namespace Evade
             //Flash
             if (ObjectManager.Player.GetSpellSlotFromName("SummonerFlash") != SpellSlot.Unknown)
             {
-                spell = new BlinkData("Flash", ObjectManager.Player.GetSpellSlotFromName("SummonerFlash"), 400, 100, 5,
-                    true);
+                spell = new BlinkData("Flash", ObjectManager.Player.GetSpellSlotFromName("SummonerFlash"), 400, 100, 5, true);
                 Spells.Add(spell);
             }
 
@@ -662,8 +650,8 @@ namespace Evade
 
             #region Champion Shields
 
-            #region Akali
-
+            #region Tahm
+            // add tahm eating here
             #endregion
 
             #region Annie
