@@ -464,7 +464,7 @@ namespace Evade
                     CanBeRemoved = true,
                     CollisionObjects =
                         new[]
-                        { CollisionObjectTypes.Champions, CollisionObjectTypes.Minion, CollisionObjectTypes.YasuoWall }
+                        {CollisionObjectTypes.Champions, CollisionObjectTypes.Minion, CollisionObjectTypes.YasuoWall}
                 });
 
             Spells.Add(

@@ -68,7 +68,7 @@ namespace Evade
 
             {
                 WallCastT = Utils.TickCount;
-                YasuoWallCastedPos = sender.ServerPosition.To2D();
+                YasuoWallCastedPos = EloBuddy.SDK.Extensions.To2D(sender.ServerPosition);
             }
         }
 
@@ -83,7 +83,7 @@ namespace Evade
                 return new FastPredResult
                 {
                     IsMoving = true,
-                    CurrentPos = unit.ServerPosition.To2D(),
+                    CurrentPos = EloBuddy.SDK.Extensions.To2D(unit.ServerPosition),
                     PredictedPos = path.CutPath((int)d)[0],
                 };
             }
@@ -210,8 +210,8 @@ namespace Evade
                         var wallWidth = (300 + 50 * Convert.ToInt32(level));
 
 
-                        var wallDirection = (wall.Position.To2D() - YasuoWallCastedPos).Normalized().Perpendicular();
-                        var wallStart = wall.Position.To2D() + wallWidth / 2 * wallDirection;
+                        var wallDirection = EloBuddy.SDK.Extensions.Normalized((wall.Position.To2D() - YasuoWallCastedPos)).Perpendicular();
+                        var wallStart = EloBuddy.SDK.Extensions.To2D(wall.Position) + wallWidth / 2 * wallDirection;
                         var wallEnd = wallStart - wallWidth * wallDirection;
                         var wallPolygon = new Geometry.Rectangle(wallStart, wallEnd, 75).ToPolygon();
                         var intersection = new Vector2();

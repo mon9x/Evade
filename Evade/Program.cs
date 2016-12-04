@@ -114,6 +114,7 @@ namespace Evade
 
             //Ondash event.
 
+            CustomEvents.Unit.OnDash += UnitOnOnDash;
             DetectedSkillshots.OnAdd += DetectedSkillshots_OnAdd;
 
             //Initialze the collision
@@ -163,8 +164,8 @@ namespace Evade
                     for (var i = -1; i <= 1; i = i + 2)
                     {
                         var skillshotToAdd = new Skillshot(
-                            DetectionType.ProcessSpell, spellData, Utils.TickCount, missile.Position.To2D(),
-                            missile.Position.To2D() + i * direction * spellData.Range, skillshot.Unit);
+                            DetectionType.ProcessSpell, spellData, Utils.TickCount, EloBuddy.SDK.Extensions.To2D(missile.Position),
+                            EloBuddy.SDK.Extensions.To2D(missile.Position) + i * direction * spellData.Range, skillshot.Unit);
                         DetectedSkillshots.Add(skillshotToAdd);
                     }
                 }
@@ -264,7 +265,7 @@ namespace Evade
 
                     if (skillshot.SpellData.Invert)
                     {
-                        var newDirection = -(skillshot.End - skillshot.Start).Normalized();
+                        var newDirection = -EloBuddy.SDK.Extensions.Normalized((skillshot.End - skillshot.Start));
                         var end = skillshot.Start + newDirection * skillshot.Start.Distance(skillshot.End);
                         var skillshotToAdd = new Skillshot(
                             skillshot.DetectionType, skillshot.SpellData, skillshot.StartTick, skillshot.Start, end,
@@ -286,11 +287,11 @@ namespace Evade
 
                     if (skillshot.SpellData.SpellName == "TaricE" && (skillshot.Unit as AIHeroClient).ChampionName == "Taric")
                     {
-                        var target = EntityManager.Heroes.AllHeroes.FirstOrDefault(h => h.Team == skillshot.Unit.Team && h.IsVisible && h.HasBuff("taricwleashactive"));
+                        var target = HeroManager.AllHeroes.FirstOrDefault(h => h.Team == skillshot.Unit.Team && h.IsVisible && h.HasBuff("taricwleashactive"));
                         if (target != null)
                         {
-                            var start = target.ServerPosition.To2D();
-                            var direction = (skillshot.OriginalEnd - start).Normalized();
+                            var start = EloBuddy.SDK.Extensions.To2D(target.ServerPosition);
+                            var direction = EloBuddy.SDK.Extensions.Normalized((skillshot.OriginalEnd - start));
                             var end = start + direction * skillshot.SpellData.Range;
                             var skillshotToAdd = new Skillshot(
                                     skillshot.DetectionType, skillshot.SpellData, skillshot.StartTick,
@@ -306,7 +307,7 @@ namespace Evade
                     {
                         var angle = 60;
                         var edge1 =
-                            (skillshot.End - skillshot.Unit.ServerPosition.To2D()).Rotated(
+                            (skillshot.End - EloBuddy.SDK.Extensions.To2D(skillshot.Unit.ServerPosition)).Rotated(
                                 -angle / 2 * (float)Math.PI / 180);
                         var edge2 = edge1.Rotated(angle * (float)Math.PI / 180);
 
@@ -323,18 +324,18 @@ namespace Evade
                         {
                             if (minion.Name == "Seed" && !minion.IsDead && (minion.Team != ObjectManager.Player.Team || Config.TestOnAllies))
                             {
-                                positions.Add(minion.ServerPosition.To2D());
+                                positions.Add(EloBuddy.SDK.Extensions.To2D(minion.ServerPosition));
                             }
                         }
 
                         foreach (var position in positions)
                         {
-                            var v = position - skillshot.Unit.ServerPosition.To2D();
+                            var v = position - EloBuddy.SDK.Extensions.To2D(skillshot.Unit.ServerPosition);
                             if (edge1.CrossProduct(v) > 0 && v.CrossProduct(edge2) > 0 &&
                                 position.Distance(skillshot.Unit) < 800)
                             {
                                 var start = position;
-                                var end = skillshot.Unit.ServerPosition.To2D()
+                                var end = EloBuddy.SDK.Extensions.To2D(skillshot.Unit.ServerPosition)
                                     .Extend(
                                         position,
                                         skillshot.Unit.Distance(position) > 200 ? 1300 : 1000);
@@ -457,9 +458,9 @@ namespace Evade
                                 var extendedE = new Skillshot(
                                     skillshot.DetectionType, skillshot.SpellData, skillshot.StartTick, skillshot.Start,
                                     skillshot.End + skillshot.Direction * 100, skillshot.Unit);
-                                if (!extendedE.IsSafe(m.Position.To2D()))
+                                if (!extendedE.IsSafe(EloBuddy.SDK.Extensions.To2D(m.Position)))
                                 {
-                                    endPos = m.Position.To2D();
+                                    endPos = EloBuddy.SDK.Extensions.To2D(m.Position);
                                 }
                                 break;
                             }
@@ -468,8 +469,8 @@ namespace Evade
                         if (endPos.IsValid())
                         {
                             skillshot = new Skillshot(DetectionType.ProcessSpell, SpellDatabase.GetByName("JarvanIVEQ"), Utils.TickCount, skillshot.Start, endPos, skillshot.Unit);
-                            skillshot.End = endPos + 200 * (endPos - skillshot.Start).Normalized();
-                            skillshot.Direction = (skillshot.End - skillshot.Start).Normalized();
+                            skillshot.End = endPos + 200 * EloBuddy.SDK.Extensions.Normalized((endPos - skillshot.Start));
+                            skillshot.Direction = EloBuddy.SDK.Extensions.Normalized((skillshot.End - skillshot.Start));
                         }
                     }
                 }
@@ -499,7 +500,7 @@ namespace Evade
 
         private static void Game_OnOnGameUpdate(EventArgs args)
         {
-            PlayerPosition = ObjectManager.Player.ServerPosition.To2D();
+            PlayerPosition = EloBuddy.SDK.Extensions.To2D(ObjectManager.Player.ServerPosition);
 
             //Set evading to false after blinking
             if (PreviousTickPosition.IsValid() &&
@@ -588,7 +589,7 @@ namespace Evade
                     var shieldAlly = Config.shielding["shield" + ally.ChampionName];
                     if (shieldAlly != null && shieldAlly.Cast<CheckBox>().CurrentValue)
                     {
-                        var allySafeResult = IsSafe(ally.ServerPosition.To2D());
+                        var allySafeResult = IsSafe(EloBuddy.SDK.Extensions.To2D(ally.ServerPosition));
 
                         if (!allySafeResult.IsSafe)
                         {
@@ -660,7 +661,7 @@ namespace Evade
                 if (!safeResult.IsSafe)
                 {
                     //Search for an evade point:
-                    TryToEvade(safeResult.SkillshotList, EvadeToPoint.IsValid() ? EvadeToPoint : Game.CursorPos.To2D());
+                    TryToEvade(safeResult.SkillshotList, EvadeToPoint.IsValid() ? EvadeToPoint : EloBuddy.SDK.Extensions.To2D(Game.CursorPos));
                 }
             }
 
@@ -910,7 +911,7 @@ namespace Evade
             }
         }
 
-        private static void UnitOnOnDash(Obj_AI_Base sender, Dash.DashEventArgs args)
+        private static void UnitOnOnDash(Obj_AI_Base sender, Dash.DashItem args)
         {
             if (sender.IsMe)
             {
@@ -1106,7 +1107,7 @@ namespace Evade
                                 if (targets.Count > 0)
                                 {
                                     var closestTarget = Utils.Closest(targets, to);
-                                    EvadePoint = closestTarget.ServerPosition.To2D();
+                                    EvadePoint = EloBuddy.SDK.Extensions.To2D(closestTarget.ServerPosition);
                                     Evading = true;
 
                                     if (evadeSpell.IsSummonerSpell)
@@ -1153,8 +1154,8 @@ namespace Evade
                                                 k = k - new Random(Utils.TickCount).Next(k);
                                                 var extended = points[i] +
                                                                k *
-                                                               (points[i] - PlayerPosition)
-                                                                   .Normalized();
+                                                               EloBuddy.SDK.Extensions.Normalized((points[i] - PlayerPosition)
+);
                                                 if (IsSafe(extended).IsSafe)
                                                 {
                                                     points[i] = extended;
@@ -1209,8 +1210,8 @@ namespace Evade
                                         k -= Math.Max(RandomN.Next(k) - 100, 0);
                                         var extended = points[i] +
                                                        k *
-                                                       (points[i] - PlayerPosition)
-                                                           .Normalized();
+                                                       EloBuddy.SDK.Extensions.Normalized((points[i] - PlayerPosition)
+);
                                         if (IsSafe(extended).IsSafe)
                                         {
                                             points[i] = extended;
@@ -1229,8 +1230,13 @@ namespace Evade
                                         {
                                             ObjectManager.Player.SendMovePacket(EvadePoint);
                                             var theSpell = evadeSpell;
-                                            Core.DelayAction(() => ObjectManager.Player.Spellbook.CastSpell(
-                                                theSpell.Slot, EvadePoint.To3D()), Game.Ping / 2 + 100);
+                                            Utility.DelayAction.Add(
+                                                Game.Ping / 2 + 100,
+                                                delegate
+                                                {
+                                                    ObjectManager.Player.Spellbook.CastSpell(
+                                                        theSpell.Slot, EvadePoint.To3D());
+                                                });
                                         }
                                         else
                                         {
@@ -1264,7 +1270,7 @@ namespace Evade
                                     if (IsAboutToHit(ObjectManager.Player, evadeSpell.Delay))
                                     {
                                         var closestTarget = Utils.Closest(targets, to);
-                                        EvadePoint = closestTarget.ServerPosition.To2D();
+                                        EvadePoint = EloBuddy.SDK.Extensions.To2D(closestTarget.ServerPosition);
                                         Evading = true;
 
                                         if (evadeSpell.IsSummonerSpell)
@@ -1316,8 +1322,8 @@ namespace Evade
                                                 k = k - new Random(Utils.TickCount).Next(k);
                                                 var extended = points[i] +
                                                                k *
-                                                               (points[i] - PlayerPosition)
-                                                                   .Normalized();
+                                                               EloBuddy.SDK.Extensions.Normalized((points[i] - PlayerPosition)
+);
                                                 if (IsSafe(extended).IsSafe)
                                                 {
                                                     points[i] = extended;
@@ -1357,7 +1363,7 @@ namespace Evade
                                     k = k - new Random(Utils.TickCount).Next(k);
                                     var extended = points[i] +
                                                    k *
-                                                   (points[i] - PlayerPosition).Normalized();
+                                                   EloBuddy.SDK.Extensions.Normalized((points[i] - PlayerPosition));
                                     if (IsSafe(extended).IsSafe)
                                     {
                                         points[i] = extended;
@@ -1402,7 +1408,7 @@ namespace Evade
                                     if (IsAboutToHit(ObjectManager.Player, evadeSpell.Delay))
                                     {
                                         var closestTarget = Utils.Closest(targets, to);
-                                        EvadePoint = closestTarget.ServerPosition.To2D();
+                                        EvadePoint = EloBuddy.SDK.Extensions.To2D(closestTarget.ServerPosition);
                                         Evading = true;
                                         ObjectManager.Player.Spellbook.CastSpell(evadeSpell.Slot, closestTarget);
                                     }
@@ -1509,7 +1515,7 @@ namespace Evade
                     Drawing.DrawLine(SA.X, SA.Y, SB.X, SB.Y, 1, Color.White);
                 }
 
-                var evadePath = Pathfinding.Pathfinding.PathFind(PlayerPosition, Game.CursorPos.To2D());
+                var evadePath = Pathfinding.Pathfinding.PathFind(PlayerPosition, EloBuddy.SDK.Extensions.To2D(Game.CursorPos));
 
                 for (var i = 0; i < evadePath.Count - 1; i++)
                 {

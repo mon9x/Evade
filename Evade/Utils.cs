@@ -31,20 +31,36 @@ namespace Evade
 {
     public static class Utils
     {
-        public static int TickCount
-        {
-            get { return (int)(Game.Time * 1000f); }
-        }
 
         public static List<Vector2> To2DList(this Vector3[] v)
         {
             var result = new List<Vector2>();
             foreach (var point in v)
             {
-                result.Add(point.To2D());
+                result.Add(EloBuddy.SDK.Extensions.To2D(point));
             }
             return result;
         }
+
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets the game time tick count.
+        /// </summary>
+        public static int GameTimeTickCount
+        {
+            get { return (int)(Game.Time * 1000); }
+        }
+
+        /// <summary>
+        ///     Gets the tick count.
+        /// </summary>
+        public static int TickCount
+        {
+            get { return Environment.TickCount & int.MaxValue; }
+        }
+
+        #endregion
 
         public static void SendMovePacket(this Obj_AI_Base v, Vector2 point)
         {
@@ -58,7 +74,7 @@ namespace Evade
 
             foreach (var target in targetList)
             {
-                var distance = Vector2.DistanceSquared(from, target.ServerPosition.To2D());
+                var distance = Vector2.DistanceSquared(from, EloBuddy.SDK.Extensions.To2D(target.ServerPosition));
                 if (distance < dist)
                 {
                     dist = distance;

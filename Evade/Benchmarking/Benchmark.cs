@@ -20,45 +20,49 @@ namespace Evade.Benchmarking
             Game.OnWndProc += Game_OnWndProc;
         }
 
+
         static void SpawnLineSkillShot(Vector2 start, Vector2 end)
         {
             SkillshotDetector.TriggerOnDetectSkillshot(
-                DetectionType.ProcessSpell, SpellDatabase.GetByName("TestLineSkillShot"), Utils.TickCount,
-                start, end, end, ObjectManager.Player);
+                   DetectionType.ProcessSpell, SpellDatabase.GetByName("TestLineSkillShot"), Utils.TickCount,
+                   start, end, end, ObjectManager.Player);
 
-            Core.DelayAction(() => SpawnLineSkillShot(start, end), 5000);
+            Utility.DelayAction.Add(5000, () => SpawnLineSkillShot(start, end));
         }
 
         static void SpawnCircleSkillShot(Vector2 start, Vector2 end)
         {
             SkillshotDetector.TriggerOnDetectSkillshot(
-                DetectionType.ProcessSpell, SpellDatabase.GetByName("TestCircleSkillShot"), Utils.TickCount,
-                start, end, end, ObjectManager.Player);
+                   DetectionType.ProcessSpell, SpellDatabase.GetByName("TestCircleSkillShot"), Utils.TickCount,
+                   start, end, end, ObjectManager.Player);
 
-            Core.DelayAction(() => SpawnCircleSkillShot(start, end), 5000);
+            Utility.DelayAction.Add(5000, () => SpawnCircleSkillShot(start, end));
         }
 
-        private static void Game_OnWndProc(WndEventArgs args)
+
+        static void Game_OnWndProc(WndEventArgs args)
         {
-            if (args.Msg == (uint)WindowMessages.LeftButtonDown)
+            if (args.Msg == (uint)WindowsMessages.WM_LBUTTONDOWN)
             {
-                startPoint = Game.CursorPos.To2D();
+                startPoint = EloBuddy.SDK.Extensions.To2D(Game.CursorPos);
             }
 
-            if (args.Msg == (uint)WindowMessages.LeftButtonUp)
+            if (args.Msg == (uint)WindowsMessages.WM_LBUTTONUP)
             {
-                endPoint = Game.CursorPos.To2D();
+                endPoint = EloBuddy.SDK.Extensions.To2D(Game.CursorPos);
             }
 
-            if (args.Msg == (uint)WindowMessages.KeyUp && args.WParam == 'L') //line missile skillshot
+            if (args.Msg == (uint)WindowsMessages.WM_KEYUP && args.WParam == 'L') //line missile skillshot
             {
                 SpawnLineSkillShot(startPoint, endPoint);
             }
 
-            if (args.Msg == (uint)WindowMessages.KeyDown && args.WParam == 'I') //circular skillshoot
+            if (args.Msg == (uint)WindowsMessages.WM_KEYUP && args.WParam == 'I') //circular skillshoot
             {
                 SpawnCircleSkillShot(startPoint, endPoint);
             }
+
+
         }
     }
 }

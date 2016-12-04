@@ -244,18 +244,18 @@ namespace Evade
 
             foreach (var target in allTargets)
             {
-                if (DontCheckForSafety || Program.IsSafe(target.ServerPosition.To2D()).IsSafe)
+                if (DontCheckForSafety || Program.IsSafe(EloBuddy.SDK.Extensions.To2D(target.ServerPosition)).IsSafe)
                 {
                     if (isBlink)
                     {
                         if (Utils.TickCount - Program.LastWardJumpAttempt < 250 ||
-                            Program.IsSafeToBlink(target.ServerPosition.To2D(), Config.EvadingFirstTimeOffset, delay))
+                            Program.IsSafeToBlink(EloBuddy.SDK.Extensions.To2D(target.ServerPosition), Config.EvadingFirstTimeOffset, delay))
                         {
                             goodTargets.Add(target);
                         }
 
                         if (Utils.TickCount - Program.LastWardJumpAttempt < 250 ||
-                            Program.IsSafeToBlink(target.ServerPosition.To2D(), Config.EvadingSecondTimeOffset, delay))
+                            Program.IsSafeToBlink(EloBuddy.SDK.Extensions.To2D(target.ServerPosition), Config.EvadingSecondTimeOffset, delay))
                         {
                             badTargets.Add(target);
                         }
@@ -264,7 +264,7 @@ namespace Evade
                     {
                         var pathToTarget = new List<Vector2>();
                         pathToTarget.Add(Program.PlayerPosition);
-                        pathToTarget.Add(target.ServerPosition.To2D());
+                        pathToTarget.Add(EloBuddy.SDK.Extensions.To2D(target.ServerPosition));
 
                         if (Utils.TickCount - Program.LastWardJumpAttempt < 250 ||
                             Program.IsSafePath(pathToTarget, Config.EvadingFirstTimeOffset, speed, delay).IsSafe)

@@ -59,7 +59,7 @@ namespace Evade
             {
                 TriggerOnDetectSkillshot(
                     DetectionType.ProcessSpell, SpellDatabase.GetByName("TestSkillShot"), Utils.TickCount,
-                    Program.PlayerPosition, Game.CursorPos.To2D(), Game.CursorPos.To2D(), ObjectManager.Player);
+                    Program.PlayerPosition, EloBuddy.SDK.Extensions.To2D(Game.CursorPos), EloBuddy.SDK.Extensions.To2D(Game.CursorPos), ObjectManager.Player);
             }
         }
 
@@ -81,7 +81,7 @@ namespace Evade
             {
                 return;
             }
-            TriggerOnDetectSkillshot(DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, sender.Position.To2D(), sender.Position.To2D(), sender.Position.To2D(), EntityManager.Heroes.AllHeroes.MinOrDefault(h => h.IsAlly ? 1 : 0));
+            TriggerOnDetectSkillshot(DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, EloBuddy.SDK.Extensions.To2D(sender.Position), EloBuddy.SDK.Extensions.To2D(sender.Position), EloBuddy.SDK.Extensions.To2D(sender.Position), EntityManager.Heroes.AllHeroes.MinOrDefault(h => h.IsAlly ? 1 : 0));
 
         }
 
@@ -166,13 +166,13 @@ namespace Evade
                 return;
             }
 
-            var missilePosition = missile.Position.To2D();
-            var unitPosition = missile.StartPosition.To2D();
-            var endPos = missile.EndPosition.To2D();
+            var missilePosition = EloBuddy.SDK.Extensions.To2D(missile.Position);
+            var unitPosition = EloBuddy.SDK.Extensions.To2D(missile.StartPosition);
+            var endPos = EloBuddy.SDK.Extensions.To2D(missile.EndPosition);
 
 
             //Calculate the real end Point:
-            var direction = (endPos - unitPosition).Normalized();
+            var direction = EloBuddy.SDK.Extensions.Normalized((endPos - unitPosition));
             if (unitPosition.Distance(endPos) > spellData.Range || spellData.FixedRange)
             {
                 endPos = unitPosition + direction * spellData.Range;
@@ -217,7 +217,7 @@ namespace Evade
                 {
                     if (skillshot.SpellData.MissileSpellName.Equals(spellName, StringComparison.InvariantCultureIgnoreCase) &&
                         (skillshot.Unit.NetworkId == caster.NetworkId &&
-                         (missile.EndPosition.To2D() - missile.StartPosition.To2D()).AngleBetween(skillshot.Direction) <
+                         (EloBuddy.SDK.Extensions.To2D(missile.EndPosition) - EloBuddy.SDK.Extensions.To2D(missile.StartPosition)).AngleBetween(skillshot.Direction) <
                          10) && skillshot.SpellData.CanBeRemoved)
                     {
                         OnDeleteMissile(skillshot, missile);
@@ -236,7 +236,7 @@ namespace Evade
                     (skillshot.SpellData.MissileSpellName.Equals(spellName, StringComparison.InvariantCultureIgnoreCase) ||
                      skillshot.SpellData.ExtraMissileNames.Contains(spellName, StringComparer.InvariantCultureIgnoreCase)) &&
                     (skillshot.Unit.NetworkId == caster.NetworkId &&
-                     ((missile.EndPosition.To2D() - missile.StartPosition.To2D()).AngleBetween(skillshot.Direction) < 10) &&
+                     ((EloBuddy.SDK.Extensions.To2D(missile.EndPosition) - EloBuddy.SDK.Extensions.To2D(missile.StartPosition)).AngleBetween(skillshot.Direction) < 10) &&
                      skillshot.SpellData.CanBeRemoved || skillshot.SpellData.ForceRemove)); // 
         }
 
@@ -314,13 +314,13 @@ namespace Evade
                 {
                     if (o.Name.Contains(spellData.FromObject))
                     {
-                        startPos = o.Position.To2D();
+                        startPos = EloBuddy.SDK.Extensions.To2D(o.Position);
                     }
                 }
             }
             else
             {
-                startPos = sender.ServerPosition.To2D();
+                startPos = EloBuddy.SDK.Extensions.To2D(sender.ServerPosition);
             }
 
             //For now only zed support.
@@ -330,8 +330,8 @@ namespace Evade
                 {
                     if (obj.IsEnemy && spellData.FromObjects.Contains(obj.Name))
                     {
-                        var start = obj.Position.To2D();
-                        var end = start + spellData.Range * (args.End.To2D() - obj.Position.To2D()).Normalized();
+                        var start = EloBuddy.SDK.Extensions.To2D(obj.Position);
+                        var end = start + spellData.Range * EloBuddy.SDK.Extensions.Normalized((EloBuddy.SDK.Extensions.To2D(args.End) - EloBuddy.SDK.Extensions.To2D(obj.Position)));
                         TriggerOnDetectSkillshot(
                             DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, start, end, end,
                             sender);
@@ -344,7 +344,7 @@ namespace Evade
                 return;
             }
 
-            var endPos = args.End.To2D();
+            var endPos = EloBuddy.SDK.Extensions.To2D(args.End);
 
             /*if (spellData.SpellName == "LucianQ" && args.Target != null &&
                 args.Target.NetworkId == ObjectManager.Player.NetworkId)
@@ -353,7 +353,7 @@ namespace Evade
             }*/
 
             //Calculate the real end Point:
-            var direction = (endPos - startPos).Normalized();
+            var direction = EloBuddy.SDK.Extensions.Normalized((endPos - startPos));
             if (startPos.Distance(endPos) > spellData.Range || spellData.FixedRange)
             {
                 endPos = startPos + direction * spellData.Range;
@@ -368,7 +368,7 @@ namespace Evade
 
             //Trigger the skillshot detection callbacks.
             TriggerOnDetectSkillshot(
-                DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, startPos, endPos, args.End.To2D(), sender);
+                DetectionType.ProcessSpell, spellData, Utils.TickCount - Game.Ping / 2, startPos, endPos, EloBuddy.SDK.Extensions.To2D(args.End), sender);
         }
 
         /// <summary>
@@ -418,13 +418,13 @@ namespace Evade
                 }
                 var castTime = Utils.TickCount - Game.Ping / 2 - spellData.Delay -
                                (int)
-                                   (1000 * missilePosition.SwitchYZ().To2D().Distance(unitPosition.SwitchYZ()) /
+                                   (1000 * EloBuddy.SDK.Extensions.To2D(missilePosition.SwitchYZ()).Distance(unitPosition.SwitchYZ()) /
                                     spellData.MissileSpeed);
 
                 //Trigger the skillshot detection callbacks.
                 TriggerOnDetectSkillshot(
-                    DetectionType.RecvPacket, spellData, castTime, unitPosition.SwitchYZ().To2D(),
-                    endPos.SwitchYZ().To2D(), endPos.SwitchYZ().To2D(), unit);
+                    DetectionType.RecvPacket, spellData, castTime, EloBuddy.SDK.Extensions.To2D(unitPosition.SwitchYZ()),
+                    EloBuddy.SDK.Extensions.To2D(endPos.SwitchYZ()), EloBuddy.SDK.Extensions.To2D(endPos.SwitchYZ()), unit);
             }
         }
     }

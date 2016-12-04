@@ -72,7 +72,7 @@ namespace Evade
             Distance = distance;
             ComingFrom = comingFrom;
             Valid = (point.X != 0) && (point.Y != 0);
-            Point = point + Config.GridSize * (ComingFrom - point).Normalized();
+            Point = point + Config.GridSize * EloBuddy.SDK.Extensions.Normalized((ComingFrom - point));
             Time = time;
         }
     }
@@ -119,7 +119,7 @@ namespace Evade
             Start = start;
             End = end;
             MissilePosition = start;
-            Direction = (end - start).Normalized();
+            Direction = EloBuddy.SDK.Extensions.Normalized((end - start));
 
             Unit = unit;
 
@@ -265,15 +265,15 @@ namespace Evade
             {
                 if (Unit.IsVisible)
                 {
-                    End = Unit.ServerPosition.To2D();
-                    Direction = (End - Start).Normalized();
+                    End = EloBuddy.SDK.Extensions.To2D(Unit.ServerPosition);
+                    Direction = EloBuddy.SDK.Extensions.Normalized((End - Start));
                     UpdatePolygon();
                 }
             }
 
             if (SpellData.SpellName == "TaricE")
             {
-                Start = Unit.ServerPosition.To2D();
+                Start = EloBuddy.SDK.Extensions.To2D(Unit.ServerPosition);
                 End = Start + Direction * this.SpellData.Range;
                 Rectangle = new Geometry.Rectangle(Start, End, SpellData.Radius);
                 UpdatePolygon();
@@ -296,9 +296,9 @@ namespace Evade
                     else
                     {
                         StartTick = Utils.TickCount - SpellData.Delay;
-                        Start = Unit.ServerPosition.To2D();
-                        End = Unit.ServerPosition.To2D() + 1000 * Unit.Direction.To2D().Perpendicular();
-                        Direction = (End - Start).Normalized();
+                        Start = EloBuddy.SDK.Extensions.To2D(Unit.ServerPosition);
+                        End = EloBuddy.SDK.Extensions.To2D(Unit.ServerPosition) + 1000 * EloBuddy.SDK.Extensions.To2D(Unit.Direction).Perpendicular();
+                        Direction = EloBuddy.SDK.Extensions.Normalized((End - Start));
                         UpdatePolygon();
                     }
                 }
@@ -310,7 +310,7 @@ namespace Evade
 
             if (SpellData.FollowCaster)
             {
-                Circle.Center = Unit.ServerPosition.To2D();
+                Circle.Center = EloBuddy.SDK.Extensions.To2D(Unit.ServerPosition);
                 UpdatePolygon();
             }
         }
@@ -645,7 +645,7 @@ namespace Evade
                 var missilePosAfterT = GetMissilePosition(time);
 
                 //TODO: Check for minion collision etc.. in the future.
-                var projection = unit.ServerPosition.To2D().ProjectOn(missilePos, missilePosAfterT);
+                var projection = EloBuddy.SDK.Extensions.To2D(unit.ServerPosition).ProjectOn(missilePos, missilePosAfterT);
 
                 if (projection.IsOnSegment && projection.SegmentPoint.Distance(unit.ServerPosition) < SpellData.Radius)
                 {
@@ -655,7 +655,7 @@ namespace Evade
                 return false;
             }
 
-            if (!IsSafe(unit.ServerPosition.To2D()))
+            if (!IsSafe(EloBuddy.SDK.Extensions.To2D(unit.ServerPosition)))
             {
                 var timeToExplode = SpellData.ExtraDuration + SpellData.Delay +
                                     (int)((1000 * Start.Distance(End)) / SpellData.MissileSpeed) -

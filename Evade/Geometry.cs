@@ -69,7 +69,7 @@ namespace Evade
                 var d = (int)to.Distance(from);
                 if (d > distance)
                 {
-                    return from + distance * (to - from).Normalized();
+                    return from + distance * EloBuddy.SDK.Extensions.Normalized((to - from));
                 }
                 distance -= d;
             }
@@ -195,7 +195,7 @@ namespace Evade
                 RStart = start;
                 REnd = end;
                 Width = width;
-                Direction = (end - start).Normalized();
+                Direction = EloBuddy.SDK.Extensions.Normalized((end - start));
                 Perpendicular = Direction.Perpendicular();
             }
 
@@ -292,8 +292,7 @@ namespace Evade
                 var innerCenter = innerCenters[0];
                 var outerCenter = outerCenters[0];
 
-                //Render.Circle.DrawCircle(innerCenter.To3D(), 100, Color.White);
-                new EloBuddy.SDK.Rendering.Circle() { BorderWidth = 2, Color = Color.White, Radius = 100 }.Draw(innerCenter.To3D());
+                Render.Circle.DrawCircle(innerCenter.To3D(), 100, Color.White);
 
                 var direction = (End - outerCenter).Normalized();
                 var end = (Start - outerCenter).Normalized();
@@ -349,7 +348,7 @@ namespace Evade
 
                 for (var i = 0; i <= CircleLineSegmentN; i++)
                 {
-                    var cDirection = Side1.Rotated(i * Angle / CircleLineSegmentN).Normalized();
+                    var cDirection = EloBuddy.SDK.Extensions.Normalized(Side1.Rotated(i * Angle / CircleLineSegmentN));
                     result.Add(new Vector2(Center.X + outRadius * cDirection.X, Center.Y + outRadius * cDirection.Y));
                 }
 

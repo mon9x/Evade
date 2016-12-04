@@ -37,7 +37,7 @@ namespace Evade.Pathfinding
                 var nPoints = 2;
                 var step = start.Distance(end) / nPoints;
 
-                var direction = (end - start).Normalized();
+                var direction = EloBuddy.SDK.Extensions.Normalized((end - start));
                 for (int i = 0; i <= nPoints; i++)
                 {
                     var p = start + i * step * direction;
