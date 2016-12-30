@@ -1144,7 +1144,7 @@ namespace Evade
                 new SpellData
                 {
                     ChampionName = "Fizz",
-                    SpellName = "FizzMarinerDoom",
+                    SpellName = "FizzR",
                     Slot = SpellSlot.R,
                     Type = SkillShotType.SkillshotMissileLine,
                     Delay = 250,
@@ -1155,7 +1155,7 @@ namespace Evade
                     AddHitbox = true,
                     DangerValue = 5,
                     IsDangerous = true,
-                    MissileSpellName = "FizzMarinerDoomMissile",
+                    MissileSpellName = "FizzRMissile",
                     EarlyEvade = new[] { EarlyObjects.Allies },
                     CollisionObjects = new[] { CollisionObjectTypes.Champions, CollisionObjectTypes.YasuoWall },
                     CanBeRemoved = true,
