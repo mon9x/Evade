@@ -554,7 +554,7 @@ namespace Evade
                 return;
             }
 
-            if (ObjectManager.Player.Spellbook.IsAutoAttacking && !Orbwalker.IsAutoAttacking)
+            if (Utility.PlayerWindingUp && !Orbwalker.IsAutoAttacking)
             {
                 Evading = false;
                 return;
