@@ -348,7 +348,7 @@ namespace Evade
 
                 for (var i = 0; i <= CircleLineSegmentN; i++)
                 {
-                    var cDirection = (Side1.Rotated(i * Angle / CircleLineSegmentN).Normalized());
+                    var cDirection = Side1.Rotated(i * Angle / CircleLineSegmentN).Normalized();
                     result.Add(new Vector2(Center.X + outRadius * cDirection.X, Center.Y + outRadius * cDirection.Y));
                 }
 

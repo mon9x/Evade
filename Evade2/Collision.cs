@@ -68,7 +68,7 @@ namespace Evade
 
             {
                 WallCastT = Utils.TickCount;
-                YasuoWallCastedPos = (sender.ServerPosition).To2D();
+                YasuoWallCastedPos = sender.ServerPosition.To2D();
             }
         }
 
@@ -83,7 +83,7 @@ namespace Evade
                 return new FastPredResult
                 {
                     IsMoving = true,
-                    CurrentPos = (unit.ServerPosition).To2D(),
+                    CurrentPos = unit.ServerPosition.To2D(),
                     PredictedPos = path.CutPath((int)d)[0],
                 };
             }
@@ -111,10 +111,11 @@ namespace Evade
                             break;
                         }
                         foreach (var minion in
-                            EntityManager.MinionsAndMonsters.Get(EntityManager.MinionsAndMonsters.EntityType.Both, skillshot.Unit.Team == ObjectManager.Player.Team
+                            EntityManager.MinionsAndMonsters.Get(
+                                EntityManager.MinionsAndMonsters.EntityType.Both,
+                                skillshot.Unit.Team == ObjectManager.Player.Team
                                     ? EntityManager.UnitTeam.Enemy
-                                    : EntityManager.UnitTeam.Ally,
-                            from.To3D(), 1200))
+                                    : EntityManager.UnitTeam.Ally, from.To3D(), 1200))
                         {
                             var pred = FastPrediction(
                                 from, minion,
@@ -210,8 +211,8 @@ namespace Evade
                         var wallWidth = (300 + 50 * Convert.ToInt32(level));
 
 
-                        var wallDirection = ((wall.Position.To2D() - YasuoWallCastedPos)).Normalized().Perpendicular();
-                        var wallStart = (wall.Position).To2D() + wallWidth / 2 * wallDirection;
+                        var wallDirection = (wall.Position.To2D() - YasuoWallCastedPos).Normalized().Perpendicular();
+                        var wallStart = wall.Position.To2D() + wallWidth / 2 * wallDirection;
                         var wallEnd = wallStart - wallWidth * wallDirection;
                         var wallPolygon = new Geometry.Rectangle(wallStart, wallEnd, 75).ToPolygon();
                         var intersection = new Vector2();

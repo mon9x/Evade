@@ -265,7 +265,7 @@ namespace Evade
             {
                 if (Unit.IsVisible)
                 {
-                    End = (Unit.ServerPosition).To2D();
+                    End = Unit.ServerPosition.To2D();
                     Direction = (End - Start).Normalized();
                     UpdatePolygon();
                 }
@@ -273,7 +273,7 @@ namespace Evade
 
             if (SpellData.SpellName == "TaricE")
             {
-                Start = (Unit.ServerPosition).To2D();
+                Start = Unit.ServerPosition.To2D();
                 End = Start + Direction * this.SpellData.Range;
                 Rectangle = new Geometry.Rectangle(Start, End, SpellData.Radius);
                 UpdatePolygon();
@@ -296,8 +296,8 @@ namespace Evade
                     else
                     {
                         StartTick = Utils.TickCount - SpellData.Delay;
-                        Start = (Unit.ServerPosition).To2D();
-                        End = (Unit.ServerPosition).To2D() + 1000 * (Unit.Direction).To2D().Perpendicular();
+                        Start = Unit.ServerPosition.To2D();
+                        End = Unit.ServerPosition.To2D() + 1000 * Unit.Direction.To2D().Perpendicular();
                         Direction = (End - Start).Normalized();
                         UpdatePolygon();
                     }
@@ -310,7 +310,7 @@ namespace Evade
 
             if (SpellData.FollowCaster)
             {
-                Circle.Center = (Unit.ServerPosition).To2D();
+                Circle.Center = Unit.ServerPosition.To2D();
                 UpdatePolygon();
             }
         }
@@ -645,7 +645,7 @@ namespace Evade
                 var missilePosAfterT = GetMissilePosition(time);
 
                 //TODO: Check for minion collision etc.. in the future.
-                var projection = (unit.ServerPosition).To2D().ProjectOn(missilePos, missilePosAfterT);
+                var projection = unit.ServerPosition.To2D().ProjectOn(missilePos, missilePosAfterT);
 
                 if (projection.IsOnSegment && projection.SegmentPoint.Distance(unit.ServerPosition) < SpellData.Radius)
                 {
@@ -655,7 +655,7 @@ namespace Evade
                 return false;
             }
 
-            if (!IsSafe((unit.ServerPosition).To2D()))
+            if (!IsSafe(unit.ServerPosition.To2D()))
             {
                 var timeToExplode = SpellData.ExtraDuration + SpellData.Delay +
                                     (int)((1000 * Start.Distance(End)) / SpellData.MissileSpeed) -

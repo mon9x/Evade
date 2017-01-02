@@ -164,9 +164,6 @@ namespace Evade
         /// <summary>
         /// Returns the safe targets to cast escape spells.
         /// </summary>
-        /// <summary>
-        /// Returns the safe targets to cast escape spells.
-        /// </summary>
         public static List<Obj_AI_Base> GetEvadeTargets(SpellValidTargets[] validTargets,
             int speed,
             int delay,
@@ -196,7 +193,9 @@ namespace Evade
 
                     case SpellValidTargets.AllyMinions:
                         allTargets.AddRange(
-                            EntityManager.MinionsAndMonsters.Get(EntityManager.MinionsAndMonsters.EntityType.Both, EntityManager.UnitTeam.Ally,
+                            EntityManager.MinionsAndMonsters.Get(
+                                EntityManager.MinionsAndMonsters.EntityType.Both,
+                                EntityManager.UnitTeam.Ally,
                                 ObjectManager.Player.Position, range));
                         break;
 
@@ -225,8 +224,9 @@ namespace Evade
 
                     case SpellValidTargets.EnemyMinions:
                         allTargets.AddRange(
-                            EntityManager.MinionsAndMonsters.Get(EntityManager.MinionsAndMonsters.EntityType.Both, EntityManager.UnitTeam.Enemy,
-                                ObjectManager.Player.Position, range));
+                            EntityManager.MinionsAndMonsters.Get(
+                                EntityManager.MinionsAndMonsters.EntityType.Both,
+                                EntityManager.UnitTeam.Enemy, ObjectManager.Player.Position, range));
                         break;
 
                     case SpellValidTargets.EnemyWards:
@@ -244,18 +244,18 @@ namespace Evade
 
             foreach (var target in allTargets)
             {
-                if (DontCheckForSafety || Program.IsSafe((target.ServerPosition).To2D()).IsSafe)
+                if (DontCheckForSafety || Program.IsSafe(target.ServerPosition.To2D()).IsSafe)
                 {
                     if (isBlink)
                     {
                         if (Utils.TickCount - Program.LastWardJumpAttempt < 250 ||
-                            Program.IsSafeToBlink((target.ServerPosition).To2D(), Config.EvadingFirstTimeOffset, delay))
+                            Program.IsSafeToBlink(target.ServerPosition.To2D(), Config.EvadingFirstTimeOffset, delay))
                         {
                             goodTargets.Add(target);
                         }
 
                         if (Utils.TickCount - Program.LastWardJumpAttempt < 250 ||
-                            Program.IsSafeToBlink((target.ServerPosition).To2D(), Config.EvadingSecondTimeOffset, delay))
+                            Program.IsSafeToBlink(target.ServerPosition.To2D(), Config.EvadingSecondTimeOffset, delay))
                         {
                             badTargets.Add(target);
                         }
@@ -264,7 +264,7 @@ namespace Evade
                     {
                         var pathToTarget = new List<Vector2>();
                         pathToTarget.Add(Program.PlayerPosition);
-                        pathToTarget.Add((target.ServerPosition).To2D());
+                        pathToTarget.Add(target.ServerPosition.To2D());
 
                         if (Utils.TickCount - Program.LastWardJumpAttempt < 250 ||
                             Program.IsSafePath(pathToTarget, Config.EvadingFirstTimeOffset, speed, delay).IsSafe)

@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using ClipperLib;
-using Evade.Pathfinding;
-using EloBuddy;
 using EloBuddy.SDK;
 using SharpDX;
-using Color = System.Drawing.Color;
 
 namespace Evade.Pathfinding
 {
@@ -113,7 +106,6 @@ namespace Evade.Pathfinding
                 result.Reverse();
 
             }
-
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());

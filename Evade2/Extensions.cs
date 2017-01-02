@@ -122,7 +122,7 @@ namespace Evade
         /// <returns></returns>
         public static float LSDistance(Obj_AI_Base anotherUnit, bool squared = false)
         {
-            return ObjectManager.Player.LSDistance(anotherUnit, squared);
+            return ObjectManager.Player.Distance(anotherUnit, squared);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Evade
         /// <param name="anotherUnit">Another unit.</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float LSDistance(this Obj_AI_Base unit, Obj_AI_Base anotherUnit, bool squared = false)
+        public static float Distance(this Obj_AI_Base unit, Obj_AI_Base anotherUnit, bool squared = false)
         {
             return unit.ServerPosition.To2D().LSDistance(anotherUnit.ServerPosition.To2D(), squared);
         }
@@ -144,7 +144,7 @@ namespace Evade
         /// <param name="anotherUnit">Another unit.</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float LSDistance(this Obj_AI_Base unit, AttackableUnit anotherUnit, bool squared = false)
+        public static float Distance(this Obj_AI_Base unit, AttackableUnit anotherUnit, bool squared = false)
         {
             return unit.ServerPosition.To2D().LSDistance(anotherUnit.Position.To2D(), squared);
         }
@@ -156,7 +156,7 @@ namespace Evade
         /// <param name="point">The point.</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float LSDistance(this Obj_AI_Base unit, Vector3 point, bool squared = false)
+        public static float Distance(this Obj_AI_Base unit, Vector3 point, bool squared = false)
         {
             return unit.ServerPosition.To2D().LSDistance(point.To2D(), squared);
         }
@@ -168,9 +168,9 @@ namespace Evade
         /// <param name="point">The point.</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float LSDistance(this Obj_AI_Base unit, Vector2 point, bool squared = false)
+        public static float Distance(this Obj_AI_Base unit, Vector2 point, bool squared = false)
         {
-            return unit.ServerPosition.To2D().LSDistance(point, squared);
+            return unit.ServerPosition.To2D().Distance(point, squared);
         }
 
         /// <summary>
@@ -194,10 +194,10 @@ namespace Evade
         /// </summary>
         /// <param name="v">The v.</param>
         /// <returns></returns>
-        public static Vector2 To2D(this Vector3 v)
+        /*public static Vector2 To2D(this Vector3 v)
         {
             return new Vector2(v.X, v.Y);
-        }
+        }*/
 
         /// <summary>
         ///     Returns the 2D distance (XY plane) between two vector.
@@ -206,9 +206,9 @@ namespace Evade
         /// <param name="other">The other.</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float LSDistance(this Vector3 v, Vector3 other, bool squared = false)
+        public static float Distance(this Vector3 v, Vector3 other, bool squared = false)
         {
-            return v.To2D().LSDistance(other, squared);
+            return v.To2D().Distance(other, squared);
         }
 
         //Vector2 class extended methods:
@@ -1544,7 +1544,7 @@ namespace Evade
             {
                 for (var i = ActionList.Count - 1; i >= 0; i--)
                 {
-                    if (ActionList[i].Time <= Utils.GameTimeTickCount)
+                    if (ActionList[i].Time <= Utils.TickCount)
                     {
                         try
                         {
@@ -1577,7 +1577,7 @@ namespace Evade
 
                 public Action(int time, Callback callback)
                 {
-                    Time = time + Utils.GameTimeTickCount;
+                    Time = time + Utils.TickCount;
                     CallbackObject = callback;
                 }
             }
