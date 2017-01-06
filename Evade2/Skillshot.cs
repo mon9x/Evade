@@ -671,7 +671,7 @@ namespace Evade
 
         public void Draw(Color color, Color missileColor, int width = 1)
         {
-            if (!GetCheckBoxValue("Enabled").CurrentValue)
+            if (!GetCheckBoxValue("Draw").CurrentValue)
             {
                 return;
             }
