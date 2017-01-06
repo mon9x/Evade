@@ -47,8 +47,6 @@ namespace Evade
 
         public static Vector2 EvadeToPoint = new Vector2();
 
-        private static bool _followPath = false;
-
         public static int LastWardJumpAttempt = 0;
 
         public static Vector2 PreviousTickPosition = new Vector2();
@@ -94,7 +92,7 @@ namespace Evade
         }
 
 
-        public static void Game_OnGameStart(EventArgs args)
+        private static void Game_OnGameStart(EventArgs args)
         {
             PlayerChampionName = ObjectManager.Player.ChampionName;
 
@@ -513,7 +511,7 @@ namespace Evade
                 return;
             }
 
-            if (Utility.PlayerWindingUp && /*!Orbwalker.IsAutoAttacking*/ !Orbwalking.IsAutoAttack(ObjectManager.Player.LastCastedSpellName()))
+            if (Utility.PlayerWindingUp && !Orbwalking.IsAutoAttack(ObjectManager.Player.LastCastedSpellName()))
             {
                 Evading = false;
                 return;
@@ -696,7 +694,7 @@ namespace Evade
 
                 if (Evading)
                 {
-                    var blockLevel = Config.misc["BlockSpells"].Cast<ComboBox>().CurrentValue;
+                    var blockLevel = Config.misc["BlockSpells"].Cast<ComboBox>().SelectedIndex;
 
                     if (blockLevel == 0)
                     {
@@ -881,7 +879,7 @@ namespace Evade
                 }
 
                 EvadeToPoint = args.EndPos;
-                //LeagueSharp.Common.Utility.DelayAction.Add(args.Duration, delegate { Evading = false; });
+                //Utility.DelayAction.Add(args.Duration, delegate { Evading = false; });
             }
         }
 
@@ -1442,13 +1440,12 @@ namespace Evade
                 var heropos = Drawing.WorldToScreen(ObjectManager.Player.Position);
                 if (Config.Menu["Enabled"].Cast<KeyBind>().CurrentValue)
                 {
-                    Drawing.DrawText(heropos.X, heropos.Y, Color.Red, "Evade: On");
+                    Drawing.DrawText(heropos.X, heropos.Y, Color.Red, "Evade: ON");
                 }
             }
 
             var Border = Config.drawings["Border"].Cast<Slider>().CurrentValue;
             var missileColor = Config.MissileColor;
-
 
             //Draw the polygon for each skillshot.
             foreach (var skillshot in DetectedSkillshots)

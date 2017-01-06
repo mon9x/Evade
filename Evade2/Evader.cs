@@ -194,9 +194,7 @@ namespace Evade
                     case SpellValidTargets.AllyMinions:
                         allTargets.AddRange(
                             EntityManager.MinionsAndMonsters.Get(
-                                EntityManager.MinionsAndMonsters.EntityType.Both,
-                                EntityManager.UnitTeam.Ally,
-                                ObjectManager.Player.Position, range));
+                                EntityManager.MinionsAndMonsters.EntityType.Both, EntityManager.UnitTeam.Ally, ObjectManager.Player.Position, range));
                         break;
 
                     case SpellValidTargets.AllyWards:
@@ -225,8 +223,7 @@ namespace Evade
                     case SpellValidTargets.EnemyMinions:
                         allTargets.AddRange(
                             EntityManager.MinionsAndMonsters.Get(
-                                EntityManager.MinionsAndMonsters.EntityType.Both,
-                                EntityManager.UnitTeam.Enemy, ObjectManager.Player.Position, range));
+                                EntityManager.MinionsAndMonsters.EntityType.Both, EntityManager.UnitTeam.Ally, ObjectManager.Player.Position, range));
                         break;
 
                     case SpellValidTargets.EnemyWards:

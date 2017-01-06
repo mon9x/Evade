@@ -31,12 +31,25 @@ namespace Evade
 {
     public static class Utils
     {
+
+        public static List<Vector2> To2DList(this Vector3[] v)
+        {
+            var result = new List<Vector2>();
+            foreach (var point in v)
+            {
+                result.Add((point).To2D());
+            }
+            return result;
+        }
+
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets the game time tick count.
+        /// </summary>
         public static int GameTimeTickCount
         {
-            get
-            {
-                return (int)(Game.Time * 1000f);
-            }
+            get { return (int)(Game.Time * 1000); }
         }
 
         /// <summary>
@@ -44,21 +57,10 @@ namespace Evade
         /// </summary>
         public static int TickCount
         {
-            get
-            {
-                return Environment.TickCount & int.MaxValue;
-            }
+            get { return Environment.TickCount & int.MaxValue; }
         }
 
-        public static List<Vector2> To2DList(this Vector3[] v)
-        {
-            var result = new List<Vector2>();
-            foreach (var point in v)
-            {
-                result.Add(point.To2D());
-            }
-            return result;
-        }
+        #endregion
 
         public static void SendMovePacket(this Obj_AI_Base v, Vector2 point)
         {

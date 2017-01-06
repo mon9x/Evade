@@ -24,7 +24,6 @@ using EloBuddy.Networking;
 using EloBuddy.SDK;
 using SharpDX;
 using SharpDX.Direct3D9;
-using System.Drawing;
 
 #endregion
 
@@ -40,7 +39,6 @@ namespace Evade
         {
             //Detect when the skillshots are created.
             //Game.OnProcessPacket += GameOnOnGameProcessPacket; // Used only for viktor's Laser :^)
-            Obj_AI_Base.OnSpellCast += ObjAiHeroOnOnProcessSpellCast;
             Obj_AI_Base.OnProcessSpellCast += ObjAiHeroOnOnProcessSpellCast;
 
             //Detect when projectiles collide.
