@@ -30,7 +30,7 @@ namespace Evade
 {
     internal static class Config
     {
-        public const bool PrintSpellData = false;
+        public const bool PrintSpellData = true;
         public const bool TestOnAllies = false;
         public const int SkillShotsExtraRadius = 9;
         public const int SkillShotsExtraRange = 20;
