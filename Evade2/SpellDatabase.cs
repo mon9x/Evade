@@ -453,7 +453,7 @@ namespace Evade
                     Type = SkillShotType.SkillshotMissileLine,
                     Delay = 250,
                     Range = 1050,
-                    Radius = 80,
+                    Radius = 70,
                     MissileSpeed = 1800,
                     FixedRange = true,
                     AddHitbox = true,
@@ -464,7 +464,7 @@ namespace Evade
                     CanBeRemoved = true,
                     CollisionObjects =
                         new[]
-                        { CollisionObjectTypes.Champions, CollisionObjectTypes.Minion, CollisionObjectTypes.YasuoWall }
+                        {CollisionObjectTypes.Champions, CollisionObjectTypes.Minion, CollisionObjectTypes.YasuoWall}
                 });
 
             Spells.Add(

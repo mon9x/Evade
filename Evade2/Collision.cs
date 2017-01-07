@@ -111,11 +111,11 @@ namespace Evade
                             break;
                         }
                         foreach (var minion in
-                            EntityManager.MinionsAndMonsters.Get(
-                                EntityManager.MinionsAndMonsters.EntityType.Both,
+                            MinionManager.GetMinions(
+                                from.To3D(), 1200, MinionTypes.All,
                                 skillshot.Unit.Team == ObjectManager.Player.Team
-                                    ? EntityManager.UnitTeam.Enemy
-                                    : EntityManager.UnitTeam.Ally, from.To3D(), 1200))
+                                    ? MinionTeam.NotAlly
+                                    : MinionTeam.NotAllyForEnemy))
                         {
                             var pred = FastPrediction(
                                 from, minion,

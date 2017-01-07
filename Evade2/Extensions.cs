@@ -21,6 +21,8 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using Evade;
+using EloBuddy.SDK.Enumerations;
+using static EloBuddy.SDK.Prediction.Manager;
 
 namespace Evade
 {
@@ -835,17 +837,17 @@ namespace Evade
         /// <param name="polygon">The polygon.</param>
         /// <param name="moveTo">The move to.</param>
         /// <returns></returns>
-        
 
-        
+
+
 
         /// <summary>
         ///     Joins all the polygones in the list in one polygone if they interect.
         /// </summary>
         /// <param name="sList">The polygon list.</param>
         /// <returns></returns>
-        
-        
+
+
 
         /// <summary>
         ///     Converts a list of <see cref="IntPoint" /> to a polygon.
@@ -930,7 +932,7 @@ namespace Evade
             ///     The points
             /// </summary>
             public List<Vector2> Points = new List<Vector2>();
-            
+
             /// <summary>
             ///     Represnets an arc polygon.
             /// </summary>
@@ -1050,7 +1052,7 @@ namespace Evade
                     set { LineEnd = (LineEnd - LineStart).Normalized() * value + LineStart; }
                 }
 
-                
+
             }
 
             /// <summary>
@@ -1162,7 +1164,7 @@ namespace Evade
                     get { return Direction.LSPerpendicular(); }
                 }
 
-                
+
             }
 
             /// <summary>
@@ -1278,7 +1280,7 @@ namespace Evade
                     _quality = quality;
                 }
 
-                
+
 
 
                 /// <summary>
@@ -1521,11 +1523,11 @@ namespace Evade
 
         public static bool PlayerWindingUp;
 
-        public static void OnPreAttack(AIHeroClient sender, Orbwalker.PreAttackArgs args)
+        public static AIHeroClient Player
         {
-            if (sender.IsMe)
+            get
             {
-                PlayerWindingUp = true;
+                return ObjectManager.Player;
             }
         }
 
@@ -1689,8 +1691,7 @@ namespace Evade
         /// <returns><c>true</c> if the name is an auto attack; otherwise, <c>false</c>.</returns>
         public static bool IsAutoAttack(string name)
         {
-            return (name.ToLower().Contains("attack") && !NoAttacks.Contains(name.ToLower())) ||
-                   Attacks.Contains(name.ToLower());
+            return (name.ToLower().Contains("attack") && !NoAttacks.Contains(name.ToLower())) || Attacks.Contains(name.ToLower());
         }
     }
 
@@ -1752,7 +1753,7 @@ namespace Evade
                 if (EloBuddy.Game.Mode == GameMode.Running)
                 {
                     //Otherwise the .ctor didn't return yet and no callback will occur
-                   Utility.DelayAction.Add(500, () => { Game_OnGameStart(new EventArgs()); });
+                    Utility.DelayAction.Add(500, () => { Game_OnGameStart(new EventArgs()); });
                 }
                 else
                 {
@@ -4011,7 +4012,7 @@ namespace Evade
                     VertexElement.VertexDeclarationEnd
                 };
 
-                _vertexDeclaration = new VertexDeclaration(Device , _vertexElements);
+                _vertexDeclaration = new VertexDeclaration(Device, _vertexElements);
 
                 #region Effect
 
@@ -4365,6 +4366,161 @@ namespace Evade
                     Console.WriteLine(@"DrawCircle: " + e);
                 }
             }
+        }
+    }
+
+    /// <summary>
+    ///     An enum representing the order the minions should be listed.
+    /// </summary>
+    public enum MinionOrderTypes
+    {
+        /// <summary>
+        ///     No order.
+        /// </summary>
+        None,
+
+        /// <summary>
+        ///     Ordered by the current health of the minion. (Least to greatest)
+        /// </summary>
+        Health,
+
+        /// <summary>
+        ///     Ordered by the maximum health of the minions. (Greatest to least)
+        /// </summary>
+        MaxHealth
+    }
+
+    /// <summary>
+    ///     The team of the minion.
+    /// </summary>
+    public enum MinionTeam
+    {
+        /// <summary>
+        ///     The minion is not on either team.
+        /// </summary>
+        Neutral,
+
+        /// <summary>
+        ///     The minions is an ally
+        /// </summary>
+        Ally,
+
+        /// <summary>
+        ///     The minions is an enemy
+        /// </summary>
+        Enemy,
+
+        /// <summary>
+        ///     The minion is not an ally
+        /// </summary>
+        NotAlly,
+
+        /// <summary>
+        ///     The minions is not an ally for the enemy
+        /// </summary>
+        NotAllyForEnemy,
+
+        /// <summary>
+        ///     Any minion.
+        /// </summary>
+        All
+    }
+
+    /// <summary>
+    ///     The type of minion.
+    /// </summary>
+    public enum MinionTypes
+    {
+        /// <summary>
+        ///     Ranged minions.
+        /// </summary>
+        Ranged,
+
+        /// <summary>
+        ///     Melee minions.
+        /// </summary>
+        Melee,
+
+        /// <summary>
+        ///     Any minion
+        /// </summary>
+        All,
+
+        /// <summary>
+        ///     Any wards. (TODO)
+        /// </summary>
+        [Obsolete("Wards have not been implemented yet in the minion manager.")]
+        Wards
+    }
+
+    /// <summary>
+    ///     Manages minions.
+    /// </summary>
+    public static class MinionManager
+    {
+        /// <summary>
+        ///     Gets minions based on range, type, team and then orders them.
+        /// </summary>
+        /// <param name="from">The point to get the minions from.</param>
+        /// <param name="range">The range.</param>
+        /// <param name="type">The type.</param>
+        /// <param name="team">The team.</param>
+        /// <param name="order">The order.</param>
+        /// <returns>List&lt;Obj_AI_Base&gt;.</returns>
+        public static List<Obj_AI_Base> GetMinions(Vector3 from,
+            float range,
+            MinionTypes type = MinionTypes.All,
+            MinionTeam team = MinionTeam.Enemy,
+            MinionOrderTypes order = MinionOrderTypes.Health)
+        {
+            var result = (from minion in ObjectManager.Get<Obj_AI_Minion>()
+                          where minion.IsValidTarget(range, false, @from)
+                          let minionTeam = minion.Team
+                          where
+                              team == MinionTeam.Neutral && minionTeam == GameObjectTeam.Neutral ||
+                              team == MinionTeam.Ally &&
+                              minionTeam ==
+                              (ObjectManager.Player.Team == GameObjectTeam.Chaos ? GameObjectTeam.Chaos : GameObjectTeam.Order) ||
+                              team == MinionTeam.Enemy &&
+                              minionTeam ==
+                              (ObjectManager.Player.Team == GameObjectTeam.Chaos ? GameObjectTeam.Order : GameObjectTeam.Chaos) ||
+                              team == MinionTeam.NotAlly && minionTeam != ObjectManager.Player.Team ||
+                              team == MinionTeam.NotAllyForEnemy &&
+                              (minionTeam == ObjectManager.Player.Team || minionTeam == GameObjectTeam.Neutral) ||
+                              team == MinionTeam.All
+                          where
+                              minion.IsMelee() && type == MinionTypes.Melee || !minion.IsMelee() && type == MinionTypes.Ranged ||
+                              type == MinionTypes.All
+                          where
+                              minionTeam == GameObjectTeam.Neutral && minion.MaxHealth > 5 && minion.IsHPBarRendered
+                          select minion).Cast<Obj_AI_Base>().ToList();
+
+            switch (order)
+            {
+                case MinionOrderTypes.Health:
+                    result = result.OrderBy(o => o.Health).ToList();
+                    break;
+                case MinionOrderTypes.MaxHealth:
+                    result = result.OrderByDescending(o => o.MaxHealth).ToList();
+                    break;
+            }
+
+            return result;
+        }
+        /// <summary>
+        ///     Gets the minions.
+        /// </summary>
+        /// <param name="range">The range.</param>
+        /// <param name="type">The type.</param>
+        /// <param name="team">The team.</param>
+        /// <param name="order">The order.</param>
+        /// <returns>List&lt;Obj_AI_Base&gt;.</returns>
+        public static List<Obj_AI_Base> GetMinions(float range,
+            MinionTypes type = MinionTypes.All,
+            MinionTeam team = MinionTeam.Enemy,
+            MinionOrderTypes order = MinionOrderTypes.Health)
+        {
+            return GetMinions(ObjectManager.Player.ServerPosition, range, type, team, order);
         }
     }
 }

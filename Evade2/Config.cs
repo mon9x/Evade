@@ -145,7 +145,7 @@ namespace Evade
             #region Collision
 
             collision = Menu.AddSubMenu("Collision", "Collision");
-            collision.Add("MinionCollision", new CheckBox("Minion collision", false));
+            collision.Add("MinionCollision", new CheckBox("Minion collision", true));
             collision.Add("HeroCollision", new CheckBox("Hero collision", false));
             collision.Add("YasuoCollision", new CheckBox("Yasuo wall collision"));
             collision.Add("EnableCollision", new CheckBox("Enabled"));
