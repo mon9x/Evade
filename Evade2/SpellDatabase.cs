@@ -622,6 +622,67 @@ namespace Evade
                 });
 
             #endregion Caitlyn
+                
+            #region Camile
+
+            Spells.Add(
+                new SpellData
+                {
+                    ChampionName = "Camille",
+                    SpellName = "CamilleE",
+                    Slot = SpellSlot.E,
+                    Type = SkillShotType.SkillshotMissileLine,
+                    Delay = 250,
+                    Range = 1100,
+                    Radius = 80,
+                    MissileSpeed = 2500,
+                    FixedRange = true,
+                    AddHitbox = true,
+                    DangerValue = 2,
+                    IsDangerous = false,
+                    MissileSpellName = "CamilleEMissile",
+                    CanBeRemoved = true,
+                });
+
+            Spells.Add(
+                new SpellData
+                {
+                    ChampionName = "Camille",
+                    SpellName = "CamilleEDash2",
+                    Slot = SpellSlot.E,
+                    Type = SkillShotType.SkillshotMissileLine,
+                    Delay = 250,
+                    Range = 800,
+                    Radius = 80,
+                    MissileSpeed = 2500,
+                    FixedRange = true,
+                    AddHitbox = true,
+                    DangerValue = 2,
+                    IsDangerous = false,
+                    MissileSpellName = "CamilleEDash2",
+                });
+
+            Spells.Add(
+                new SpellData
+                {
+                    ChampionName = "Camille",
+                    SpellName = "CamilleW",
+                    Slot = SpellSlot.W,
+                    Type = SkillShotType.SkillshotCone,
+                    Delay = 400,
+                    Range = 675,
+                    Radius = 4,
+                    MissileSpeed = 2500,
+                    FixedRange = true,
+                    AddHitbox = true,
+                    DangerValue = 2,
+                    IsDangerous = false,
+                    MissileSpellName = "CamilleW",
+                    MissileFollowsUnit = true,
+                    ForceRemove = true,
+                });
+
+            #endregion Camile
 
             #region Cassiopeia
 
