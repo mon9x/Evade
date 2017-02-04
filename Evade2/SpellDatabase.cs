@@ -1144,21 +1144,40 @@ namespace Evade
                 new SpellData
                 {
                     ChampionName = "Fizz",
-                    SpellName = "FizzMarinerDoom",
+                    SpellName = "FizzR",
                     Slot = SpellSlot.R,
                     Type = SkillShotType.SkillshotMissileLine,
                     Delay = 250,
                     Range = 1275,
-                    Radius = 120,
+                    Radius = 110,
                     MissileSpeed = 1300,
                     FixedRange = false,
                     AddHitbox = true,
                     DangerValue = 5,
                     IsDangerous = true,
-                    MissileSpellName = "FizzMarinerDoomMissile",
-                    EarlyEvade = new[] { EarlyObjects.Allies },
-                    CollisionObjects = new[] { CollisionObjectTypes.Champions, CollisionObjectTypes.YasuoWall },
+                    MissileSpellName = "FizzRMissile",
+                    ExtraDuration = 2300,
+                    EarlyEvade = new[] {EarlyObjects.Allies},
+                    CollisionObjects = new[] {CollisionObjectTypes.Champions, CollisionObjectTypes.YasuoWall},
                     CanBeRemoved = true,
+                });
+
+            Spells.Add(
+                new SpellData
+                {
+                    ChampionName = "Fizz",
+                    SpellName = "FizzQ",
+                    Slot = SpellSlot.Q,
+                    Type = SkillShotType.SkillshotMissileLine,
+                    Delay = 250,
+                    Range = 550,
+                    Radius = 60,
+                    MissileSpeed = 3000,
+                    FixedRange = true,
+                    AddHitbox = true,
+                    DangerValue = 2,
+                    IsDangerous = true,
+                    MissileSpellName = "",
                 });
             
             Spells.Add(
@@ -2258,7 +2277,7 @@ namespace Evade
                 new SpellData
                 {
                     ChampionName = "Leblanc",
-                    SpellName = "LeblancSlide",
+                    SpellName = "LeblancW",
                     Slot = SpellSlot.W,
                     Type = SkillShotType.SkillshotCircle,
                     Delay = 0,
@@ -2269,7 +2288,7 @@ namespace Evade
                     AddHitbox = true,
                     DangerValue = 2,
                     IsDangerous = false,
-                    MissileSpellName = "LeblancSlide",
+                    MissileSpellName = "LeblancW",
                 });
 
             Spells.Add(
@@ -2294,19 +2313,19 @@ namespace Evade
                 new SpellData
                 {
                     ChampionName = "Leblanc",
-                    SpellName = "LeblancSoulShackle",
+                    SpellName = "LeblancE",
                     Slot = SpellSlot.E,
                     Type = SkillShotType.SkillshotMissileLine,
                     Delay = 250,
                     Range = 950,
-                    Radius = 55,
-                    MissileSpeed = 1750,
+                    Radius = 70,
+                    MissileSpeed = 1600,
                     FixedRange = true,
                     AddHitbox = true,
                     DangerValue = 3,
                     IsDangerous = true,
-                    MissileSpellName = "LeblancSoulShackle",
-                    EarlyEvade = new[] { EarlyObjects.Allies, EarlyObjects.Minions, EarlyObjects.AllyObjects },
+                    MissileSpellName = "LeblancE",
+                    EarlyEvade = new[] {EarlyObjects.Allies, EarlyObjects.Minions, EarlyObjects.AllyObjects},
                     CanBeRemoved = true,
                     CollisionObjects =
                         new[]
@@ -2317,18 +2336,18 @@ namespace Evade
                 new SpellData
                 {
                     ChampionName = "Leblanc",
-                    SpellName = "LeblancSoulShackleM",
+                    SpellName = "LeblancEM",
                     Slot = SpellSlot.R,
                     Type = SkillShotType.SkillshotMissileLine,
                     Delay = 250,
                     Range = 950,
-                    Radius = 55,
-                    MissileSpeed = 1750,
+                    Radius = 70,
+                    MissileSpeed = 1600,
                     FixedRange = true,
                     AddHitbox = true,
                     DangerValue = 3,
                     IsDangerous = true,
-                    MissileSpellName = "LeblancSoulShackleM",
+                    MissileSpellName = "LeblancEM",
                     CanBeRemoved = true,
                     CollisionObjects =
                         new[]
