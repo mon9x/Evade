@@ -13,6 +13,7 @@ namespace Orbextra
     //using Color = System.Drawing.Color;
     using System.Net;
     using EloBuddy.SDK.Rendering;
+    using EloBuddy.SDK.Events;
 
     /// <summary>
     ///     This class offers everything related to auto-attacks and orbwalking.
@@ -369,6 +370,19 @@ namespace Orbextra
             {
                 return false;
             }//*/
+            if (Player.ChampionName == "Darius")
+            {
+                if (Player.HasBuff("dariusqcast"))
+                {
+                    return false;
+                }
+            }
+
+            if (Player.ChampionName == "Kalista")
+            {
+                if (Player.IsDashing())
+                    return false;
+            }
 
             return Core.GameTickCount + Game.Ping / 2 + 25 >= LastAATick + Player.AttackDelay * 1000;
         }
@@ -442,8 +456,8 @@ namespace Orbextra
         /// <returns>System.Single.</returns>
         public static float GetRealAutoAttackRange(AttackableUnit target)
         {
-            var result = Player.AttackRange + Player.BoundingRadius;
-            if (target.IsValidTarget(null, true, null))
+            var result = EloBuddy.Player.Instance.GetAutoAttackRange(target);
+            if (target.IsValidTarget() && target != null)
             {
                 var aiBase = target as Obj_AI_Base;
                 if (aiBase != null && Player.ChampionName == "Caitlyn")
@@ -454,10 +468,10 @@ namespace Orbextra
                     }
                 }
 
-                return result + target.BoundingRadius;
+                return result;
             }
 
-            return result;
+            return result - 25;
         }
 
         /// <summary>
@@ -759,9 +773,9 @@ namespace Orbextra
             if (sender.IsMe)
             {
                 var ping = Game.Ping;
-                if (ping <= 30) //First world problems kappa
+                if (ping <= 50) //First world problems kappa
                 {
-                    Core.DelayAction(() => Obj_AI_Base_OnSpellCast_Delayed(sender, args), 30 - ping);
+                    Core.DelayAction(() => Obj_AI_Base_OnSpellCast_Delayed(sender, args), 50 - ping);
                     return;
                 }
 
@@ -804,12 +818,15 @@ namespace Orbextra
             {
                 if (unit.IsMe)
                 {
-                    if (IsAutoAttackReset(Spell.SData.Name) && Spell.SData.SpellCastTime == 0)
+                    if (IsAutoAttackReset(Spell.SData.Name))
                     {
-                        ResetAutoAttackTimer();
+                        Core.DelayAction(ResetAutoAttackTimer, 30);
                     }
 
                     if (!IsAutoAttack(Spell.SData.Name))
+                    {
+                        _missileLaunched = true;
+                    }
                         return;
                 }
             }
@@ -831,8 +848,10 @@ namespace Orbextra
                     //    ResetAutoAttackTimer();
                 }
 
-                if (!IsAutoAttack(spellName))
-                    return;
+                if (unit.IsMe && IsAutoAttackReset(spellName) && (Math.Abs(Spell.SData.CastTime) < float.Epsilon || Spell.SData.CastTime > 0.2f))
+                {
+                    Core.DelayAction(ResetAutoAttackTimer, 30);
+                }
 
                 if (Spell.Target is Obj_AI_Base || Spell.Target is Obj_BarracksDampener || Spell.Target is Obj_HQ)
                 {
@@ -876,7 +895,7 @@ namespace Orbextra
         {
             if (spellbook.IsValid && spellbook.IsMe && EloBuddy.SDK.Orbwalker.IsRanged && args.DestroyMissile && args.StopAnimation && !EloBuddy.SDK.Orbwalker.CanBeAborted)// CanCancelAttack)
             {
-                ResetAutoAttackTimer();
+                Core.DelayAction(ResetAutoAttackTimer, 30);
             }
         }
 
@@ -1307,9 +1326,10 @@ namespace Orbextra
                 }
 
                 //Forced target
-                if (this._forcedTarget.IsValidTarget(null, true, null) && this.InAutoAttackRange(this._forcedTarget))
+                if (this._forcedTarget != null)
                 {
-                    return this._forcedTarget;
+                    if (this._forcedTarget.IsHPBarRendered && this._forcedTarget.IsValidTarget() && this.InAutoAttackRange(this._forcedTarget))
+                        return this._forcedTarget;
                 }
 
                 /* turrets / inhibitors / nexus */
@@ -1366,7 +1386,7 @@ namespace Orbextra
                             .Where(
                                 mob =>
                                 mob.IsValidTarget(null, true, null) && mob.Team == GameObjectTeam.Neutral && this.InAutoAttackRange(mob)
-                                && mob.CharData.BaseSkinName != "gangplankbarrel" && mob.Name != "WardCorpse");
+                                && mob.CharData.BaseSkinName != "gangplankbarrel" && mob.Name != "WardCorpse" && !mob.BaseSkinName.Contains("Plant"));
 
                     result = getCheckBoxItem(misc, "Smallminionsprio")
                                  ? jminions.MinOrDefault(mob => mob.MaxHealth)
@@ -1589,7 +1609,7 @@ namespace Orbextra
                                       .Where(
                                           minion =>
                                           minion.IsValidTarget(null, true, null) && this.InAutoAttackRange(minion)
-                                          && this.ShouldAttackMinion(minion))
+                                          && this.ShouldAttackMinion(minion) && !minion.BaseSkinName.Contains("Plant"))
                                   let predHealth =
                                       HealthPrediction.LaneClearHealthPrediction(
                                           minion,
