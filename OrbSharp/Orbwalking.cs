@@ -456,7 +456,7 @@ namespace Orbextra
         /// <returns>System.Single.</returns>
         public static float GetRealAutoAttackRange(AttackableUnit target)
         {
-            var result = EloBuddy.Player.Instance.GetAutoAttackRange(target);
+            var result = EloBuddy.Player.Instance.GetAutoAttackRange(null);
             if (target.IsValidTarget() && target != null)
             {
                 var aiBase = target as Obj_AI_Base;
